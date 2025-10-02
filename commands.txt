@@ -1,0 +1,6 @@
+commands to run the App:
+To run frontend - {npm start}
+To run backend - {nodemon server.js}
+To run both simultaneously - {npm run dev}
+To run tailwind css - {npx tailwindcss -i ./src/styles/tailwind.css -o ./src/styles/output.css --watch (must kept running while performing)}.
+

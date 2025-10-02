@@ -1,0 +1,260 @@
+
+/* Home Container */
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #f8fafc, #e0f2fe);
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to right, #2563eb, #1d4ed8, #4f46e5);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.hero-content {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 7rem;
+  text-align: center;
+}
+
+
+.hero-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-title span {
+  color: #bfdbfe;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #dbeafe;
+  margin-bottom: 2rem;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+#heart {
+  position: relative;
+  width: 80px;
+  height: 72px;
+  margin: 0 auto 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+#heart:hover {
+  transform: scale(1.1);
+}
+
+#heart:before,
+#heart:after {
+  content: '';
+  width: 42px;
+  height: 64px;
+  position: absolute;
+  left: 40px;
+  top: 0;
+  background: linear-gradient(135deg, #0048ffac, #0a1bd6, #0080ffff);
+  border: 3px solid white;
+  border-radius: 40px 40px 0 0;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+  box-shadow: 0 8px 25px rgba(26, 26, 32, 0.711);
+  filter: brightness(1.2);
+}
+
+#heart:after {
+  left: -2px;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+}
+/* Features Section */
+.features-section {
+  padding: 5rem 1.5rem;
+  background: white;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.features-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.features-header p {
+  font-size: 1.125rem;
+  color: #4b5563;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Cards */
+.feature-card {
+  border: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+}
+
+.feature-card:hover {
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.feature-card-header {
+  text-align: center;
+  padding-bottom: 0.5rem;
+}
+
+.feature-card-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.feature-card-icon:hover {
+  transform: scale(1.1);
+}
+
+.feature-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.feature-card-content p {
+  color: #4b5563;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Benefits Section */
+.benefits-section {
+  padding: 5rem 1.5rem;
+  background: linear-gradient(to right, #eff6ff, #e0f2fe);
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.benefit-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.benefit-subtitle {
+  font-size: 1.125rem;
+  color: #4b5563;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.benefit-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Statistics Card */
+.stats-card-wrapper {
+  position: relative;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 1.875rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  padding: 2rem;
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+.stats-card .stats-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.stats-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #60a5fa, #8b5cf6);
+  border-radius: 1.875rem;
+  transform: rotate(6deg);
+  opacity: 0.2;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 5rem 1.5rem;
+  background: #111827;
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.cta-section p {
+  font-size: 1.25rem;
+  color: #d1d5db;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+
+
+
+
+
+

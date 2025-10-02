@@ -1,0 +1,59 @@
+Frontend:
+To create react app in frontend for UI - {npx create-react-app my-app} -> this creates frontend package.json.
+
+To serve whole React site via Express - {npm run build # for production build}
+
+To route multiple webpages - {npm install react-router-dom}
+
+Backend:
+This creates a basic package.json with default values - {npm init -y} -> this creates backend package.json.
+
+To Install backend dependencies - {npm install express path} -> express → backend server framework, path → built-in Node.js module for file paths. 
+
+For development tools like nodemon - {npm install --save-dev nodemon} -> --save-dev → only used during development, not production.
+
+lucide-react:(commands)
+npm install lucide-react@latest -> Lucide is an open-source icon library for displaying icons and symbols in digital and non-digital projects.
+
+Tailwindcss:(Install Tailwind CSS IntelliSense extension in VS Code.)
+1-cd frontend(UI)
+2-npm install -D tailwindcss postcss autoprefixer
+3-npx tailwindcss init -p -> This generates: tailwind.config.js, postcss.config.js -> files
+4-{content: ["./src/**/*.{js,jsx,ts,tsx}",],} -> This must be included in tailwind.config.js if not installed auto 
+5-To make the tailwind work for UI must create a tailwind.css file in styles and add these in them -> @tailwind base;@tailwind components;@tailwind utilities;
+6- {npm install clsx tailwind-variants} -> Install clsx if your cn(className) utility depends on it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+react home page-with tailwindcss
+
+import { 
+    Activity, 
+    Brain, 
+    Shield, 
+    Clock, 
+    Users, 
+    Award,
+    ArrowRight,
+    Heart,
+    CheckCircle
+} from "lucide-react";
+
+
+
+
+
