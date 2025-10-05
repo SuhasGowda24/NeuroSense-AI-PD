@@ -1,17 +1,31 @@
 import {useState} from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "./ui/button";
-import { Heart, Activity, Globe } from 'lucide-react';
+import { Heart, Activity, Globe, CircleUser } from 'lucide-react';
+
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState("English");  
   const [langMenuOpen, setLangMenuOpen] = useState(false);    
 
+
+
+//
+ const [role, setRole] = useState("Patient");
+  const [open, setOpen] = useState(false);
+
+  const handleSelect = (selectedRole) => {
+    setRole(selectedRole);
+    setOpen(false);
+  };
+//
+
+
+
 const handleLanguageChange = (lang) => {
   setCurrentLang(lang);
 };
-
 
 
   const navigationLinks = [
@@ -121,6 +135,39 @@ const handleLanguageChange = (lang) => {
   )}
 </div>
           </div>
+
+  
+ <div className="relative inline-block text-left">
+      {/* Trigger button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+      >
+        <CircleUser size={20} className="text-yellow-300" />
+        <span>{role}</span>
+      </button>
+
+      {/* Dropdown menu */}
+      {open && (
+        <div  className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+          <div className="py-1">
+            <Link to="/PatientDashboard"
+              onClick={() => handleSelect("Patient")}
+               className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-100"
+            >
+              Patient
+            </Link>
+            <Link to="/AdminDashboard"
+              onClick={() => handleSelect("Admin")}
+              className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-100"
+            >
+              Admin
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+
 
           {/* Mobile menu button */}
           <div className="md:hidden">

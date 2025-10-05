@@ -98,12 +98,12 @@ export default function Home() {
   {features.map((feature, index) => {
     const Icon = feature.icon;
 
-  // Map each index to a specific page
-  const cardLinks = ["/card1", "/card2", "/card3", "/card4"];
-  const link = cardLinks[index] || "/";
+  // // Map each index to a specific page
+  // const cardLinks = ["/card1", "/card2", "/card3", "/card4"];
+  // const link = cardLinks[index] || "/";
 
   return (
-    <Link key={index} to={link} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+    <div key={index}  className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
       <CardHeader className="text-center pb-2">
         <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
           <Icon />
@@ -113,7 +113,7 @@ export default function Home() {
       <CardContent>
         <p className="text-gray-600 text-center leading-relaxed"> {feature.description}</p>
       </CardContent>
-    </Link>
+    </div>
   );
 })}
   </div>

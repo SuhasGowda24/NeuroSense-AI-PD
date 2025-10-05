@@ -111,7 +111,7 @@ export default function ParkinsonsApp() {
       </section>
 
       {/* Community & Local */}
-      <section
+      {/* <section
         className="community-local bg-white py-12 px-6 text-center"
         id="community"
       >
@@ -121,27 +121,7 @@ export default function ParkinsonsApp() {
           <li>Local doctors/clinics in Bengaluru/Karnataka</li>
           <li>Events: Upcoming yoga/exercise classes, webinars</li>
         </ul>
-      </section>
-
-      {/* Footer */}
-      <footer className="footer bg-gray-800 text-white py-6 px-6 mt-12">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="text-sm">
-            Sources | Medical Disclaimer | Helpline: 1800-XXX-XXXX
-          </span>
-          <div className="flex gap-3">
-            <button className="bg-gray-700 px-3 py-1 rounded hover:bg-gray-600">
-              English
-            </button>
-            <button className="bg-gray-700 px-3 py-1 rounded hover:bg-gray-600">
-              Kannada
-            </button>
-            <button className="bg-gray-700 px-3 py-1 rounded hover:bg-gray-600">
-              Hindi
-            </button>
-          </div>
-        </div>
-      </footer>
+      </section> */}
     </div>
   );
 }
