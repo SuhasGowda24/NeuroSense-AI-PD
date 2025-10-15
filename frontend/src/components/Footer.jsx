@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import "../styles/style.css"
 import { 
     Heart, 
     Mail, 
@@ -13,6 +14,11 @@ import {
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
+
+//ScrollUp
+    const [visible, setVisible] = useState(false);
+    const [offset, setOffset] = useState(0);
+
 
     const footerLinks = {
         platform: [
@@ -35,7 +41,102 @@ export default function Footer() {
         ]
     };
 
+    //ScrollUp Button
+ useEffect(() => {
+    const radius = 45;
+    const circumference = 2 * Math.PI * radius;
+    const progressCircle = document.getElementById("progressCircle");
+
+    if (progressCircle) {
+      progressCircle.style.strokeDasharray = circumference;
+      progressCircle.style.strokeDashoffset = circumference;
+    }
+
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrolled / height) * 100;
+
+      const newOffset = circumference * (1 - progress / 100);
+      setOffset(newOffset);
+
+      if (scrolled > 300) {
+        setVisible(true);
+      } else {
+        setVisible(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+
+
     return (
+        <>
+
+          {/* Scroll to Top Button */}
+     <button
+  onClick={scrollToTop}
+  className={`fixed bottom-8 right-8 z-50 transition-all duration-300 ease-in-out 
+  ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
+  aria-label="Scroll to top"
+>
+  <div className="relative w-16 h-16 md:w-14 md:h-14">
+    <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+      <circle
+        cx="50"
+        cy="50"
+        r="45"
+        fill="none"
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth="6"
+      />
+      <circle
+        id="progressCircle"
+        cx="50"
+        cy="50"
+        r="45"
+        fill="none"
+        stroke="url(#gradient)"
+        strokeWidth="6"
+        strokeLinecap="round"
+        className="transition-[stroke-dashoffset] duration-300 ease-linear"
+        style={{ strokeDashoffset: offset }}
+      />
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#a855f7" />
+          <stop offset="100%" stopColor="#ec4899" />
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div className="absolute inset-2 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center shadow-2xl transition-transform duration-300 hover:scale-110">
+      {/* Fixed Arrow */}
+      <svg
+        className="w-6 h-6 text-white"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 19V5" />
+        <path d="M5 12l7-7 7 7" />
+      </svg>
+    </div>
+  </div>
+</button>
+
+
+            {/* Footer */}
         <footer className="bg-gray-900 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="py-12">
@@ -168,5 +269,6 @@ export default function Footer() {
                 </div>
             </div>
         </footer>
+        </>
     );
 }

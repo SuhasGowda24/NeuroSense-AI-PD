@@ -56,8 +56,9 @@ export default function Home() {
         <div className="hero-content">
           <div className="hero-icon-wrapper">
             <div id="heart"></div>
-            {/* <Heart id="heart"/> */}
           </div>
+
+
           <h1 className="hero-title">
             Early Parkinson's <br />
             <span>Detection Platform</span>

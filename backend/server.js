@@ -1,39 +1,27 @@
-// const express = require("express");
-// const path = require("path");
-// const app = express();
-// const PORT = process.env.PORT || 5000;
+import dotenv from "dotenv";
+import express from "express";
+import connectDB from "./db.js";
+import authRoutes from "./routes/authRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js"
+import cors from "cors";
 
-// // Middleware
-// app.use(express.json());
+// Load environment variables
+dotenv.config();
 
-// // Dummy database
-// const users = [];
+const app = express();
+// Connect to MongoDB
+connectDB();
 
-// // Signup API
-// app.post("/api/signup", (req, res) => {
-//   const { email, password } = req.body;
-//   const exists = users.find(u => u.email === email);
-//   if (exists) return res.status(400).json({ message: "User already exists" });
-//   users.push({ email, password });
-//   res.status(201).json({ message: "Signup successful" });
-// });
+// Middleware
+app.use(cors()); // Allow frontend to connect
+app.use(express.json());
 
-// // Login API
-// app.post("/api/login", (req, res) => {
-//   const { email, password } = req.body;
-//   const user = users.find(u => u.email === email && u.password === password);
-//   if (!user) return res.status(400).json({ message: "Invalid credentials" });
-//   res.status(200).json({ message: "Login successful" });
-// });
 
-// // Serve React build
-// app.use(express.static(path.join(__dirname, "../frontend/build")));
+// Routes
+app.use("/api/auth", authRoutes); // Single auth route for signup/login
+app.use("/api/dashboard", dashboardRoutes); // Protected dashboard routes
+app.use("/api/profile", profileRoutes); // Fetches Profile data for Welcome Card
 
-// // Catch-all: React frontend routing
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Server running at http://localhost:${PORT}`);
-// });
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

@@ -1,24 +1,24 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
-// import { Badge } from "../ui/badge";
-import { Sparkles, MapPin } from "lucide-react";
+import { Sparkles, MapPin, Calendar, User } from "lucide-react";
 import { motion } from "framer-motion";
 
-// const stageLabels = {
-//   newly_diagnosed: "Newly Diagnosed",
-//   mid_stage: "Mid-Stage",
-//   advanced: "Advanced",
-//   caregiver: "Caregiver"
-// };
+const stageLabels = {
+  newly_diagnosed: "Newly Diagnosed",
+  mid_stage: "Mid-Stage",
+  advanced: "Advanced",
+  // caregiver: "Caregiver"
+};
 
-// const stageColors = {
-//   newly_diagnosed: "bg-blue-100 text-blue-800 border-blue-200",
-//   mid_stage: "bg-yellow-100 text-yellow-800 border-yellow-200",
-//   advanced: "bg-orange-100 text-orange-800 border-orange-200",
-//   caregiver: "bg-purple-100 text-purple-800 border-purple-200"
-// };
+const stageColors = {
+  newly_diagnosed: "bg-blue-100 text-blue-800 border-blue-200",
+  mid_stage: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  advanced: "bg-orange-100 text-orange-800 border-orange-200"
+  // caregiver: "bg-purple-100 text-purple-800 border-purple-200"
+};
 
 export default function WelcomeCard({ profile, user }) {
+  const name = profile?.name || user?.name || "";
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good Morning";
@@ -70,13 +70,14 @@ export default function WelcomeCard({ profile, user }) {
                 <Sparkles className="w-5 h-5 text-yellow-300" />
                 <span className="text-teal-100 font-medium text-sm">{getGreeting()}</span>
               </motion.div>
+              
               <motion.h1 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
                 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight"
               >
-                {user?.full_name || "Welcome"}
+                Welcome {name}
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, x: -20 }}
@@ -87,30 +88,50 @@ export default function WelcomeCard({ profile, user }) {
                 Your journey matters, and you're not alone
               </motion.p>
             </div>
+
+             {/* Stage Badge */}
+            {profile?.stage && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
             >
-              {/* <Badge className={`${stageColors[profile.stage]} border-2 font-semibold px-6 py-2 text-sm shadow-lg`}>
-                {stageLabels[profile.stage]}
-              </Badge> */}
-            </motion.div>
+             <div
+                  className={`${stageColors[profile.stage]} border-2 font-semibold px-6 py-2 text-sm rounded-full shadow-lg`}
+                >
+                  {stageLabels[profile.stage] || profile.stage}
+                </div>
+              </motion.div>
+            )}
           </div>
-          
-          {profile.location && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mt-6"
-            >
+          {/* Additional Info Row */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-6 flex flex-wrap gap-4"
+          >
+            {profile?.location && (
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-5 py-2.5 shadow-lg">
                 <MapPin className="w-4 h-4" />
                 <span className="text-sm font-medium">{profile.location}</span>
               </div>
-            </motion.div>
-          )}
+            )}
+            {profile?.diagnosis_date && (
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-5 py-2.5 shadow-lg">
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  Diagnosed: {profile.diagnosis_date}
+                </span>
+              </div>
+            )}
+            {profile?.age && (
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-5 py-2.5 shadow-lg">
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium">{profile.age} years</span>
+              </div>
+            )}
+          </motion.div>
         </CardContent>
       </Card>
     </motion.div>

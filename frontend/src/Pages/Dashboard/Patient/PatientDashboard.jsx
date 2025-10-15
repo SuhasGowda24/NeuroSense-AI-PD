@@ -7,8 +7,9 @@ import { Badge } from "../../../components/ui/badge";
 import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRight, Sparkles } from "lucide-react";
 import WelcomeCard from "../../../components/PDashboard/WelcomeCard";
 import QuickStats from "../../../components/PDashboard/QuickStats";
+import SetupProfile from "../../../components/PDashboard/SetupProfile";
 
-//Suggestions
+//Suggestions of Learning Modules
 const modules = {
   newly_diagnosed: [
     { title: "Understanding Parkinson's", description: "Learn the basics of PD", progress: 0 },
@@ -33,41 +34,57 @@ const modules = {
 };
 
 
-// ---- Static dummy data ----
-const staticUser = { name: "Patient" };
-const staticProfile = { stage: "newly_diagnosed", location: "Bengaluru" };
-
-const staticSymptoms = [
-  { id: 1, description: "Tremor", date: "2025-10-01" },
-  { id: 2, description: "Rigidity", date: "2025-10-02" }
-];
-
-const staticEvents = [
-  { id: 1, title: "Doctor Visit", date: "2025-10-05" },
-  { id: 2, title: "Therapy Session", date: "2025-10-06" }
-];
-
 //Framer Motion Variants
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
+const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 export default function PatientDashboard() {
-
-   const PatientDashboard = modules[staticProfile?.stage] || modules.newly_diagnosed;
-
   const [loading, setLoading] = useState(true);
-
+  const [ user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [showSetup, setShowSetup] = useState(false);
+  const [symptoms] = useState([]);
+  const [events] = useState([]);
+  const token = localStorage.getItem("token"); // JWT stored at login
+  
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
+
+    useEffect(() => {
+    const storedUser = localStorage.getItem("user"); // e.g., set after signup/login
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // instantly show name
+    }
+  }, []);
+
+  // Fetch Profile Data
+  useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+        const res = await fetch("/api/profile/me", {
+        headers: { "Authorization": `Bearer ${token}`},
+      });
+      if (!res.ok) throw new Error(`Failed to fetch profile`);
+
+      const data = await res.json();
+      setProfile(data); // Save profile data to local
+      
+      if (!data.stage) setShowSetup(true); // show setup if incomplete
+    } catch (error) {
+      console.log("Profile missing, showing setup form");
+      setShowSetup(true);
+    }
+  };
+
+  fetchProfile();
+}, [token]);
+
+const handleSetupComplete = (ProfileData) => {
+    setProfile(ProfileData);
+    setShowSetup(false);
+  };
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -75,15 +92,15 @@ export default function PatientDashboard() {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="p-6 lg:p-10 space-y-8 max-w-7xl mx-auto">
-      
-      {/* Welcome Card */}
-      <motion.div variants={item}>
-        <WelcomeCard profile={staticProfile} user={staticUser} />
-      </motion.div>
-
+      {/* Welcome Card*/}
+     <div className="bg-gray-50">
+      {showSetup && <SetupProfile user={user} onComplete={handleSetupComplete} />}
+      {profile && !showSetup && <WelcomeCard profile={profile} user={user} />}
+    </div>
+    
       {/* Quick Stats */}
       <motion.div variants={item}>
-        <QuickStats symptoms={staticSymptoms} events={staticEvents} />
+        <QuickStats symptoms={symptoms} events={events} />
       </motion.div>
 
       {/* Left Column - Medications */}
@@ -140,7 +157,7 @@ export default function PatientDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-3">
-            {PatientDashboard.map((module, index) => (
+           {profile && modules[profile.stage]?.map((module, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
