@@ -9,6 +9,7 @@ import { Activity,
     Users, 
     Award,
     ArrowRight,
+    BookOpen,
     // Heart,
     CheckCircle } from "lucide-react";
 
@@ -67,20 +68,24 @@ export default function Home() {
             Revolutionary AI-powered handwriting analysis for early detection of Parkinson's disease. 
             Simple, accurate, and accessible screening that could save lives through early intervention.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link to="Assignment">
-                <Button className="group relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 min-w-[220px] border border-blue-400/20">
-
-                  <Activity className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform duration-300" />
-                   <span className="text-lg">Take Assessment</span>
-                </Button>
-              </Link>
-              <Button variant="outline" className="bg-white text-black hover:bg-blue-500 to-indigo-600 font-semibold py-4 px-8 rounded-xl backdrop-blur-sm text-lg transition-colors duration-200">
-                Learn More
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </div>
+            <div className="flex flex-col items-center gap-8">
+  <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+    <Link to="Assignment">
+      <Button className="group relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 min-w-[220px] border border-blue-400/20">
+        <Activity className="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform duration-300" />
+        <span className="text-lg">More About Assessment</span>
+      </Button>
+    </Link>
+    
+    <Link to="/learning">
+      <Button  className="bg-white/100 backdrop-blur-lg border-2 border-white/30 text-blue-700 hover:bg-blue-600 hover:text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-all duration-300 min-w-[220px]">
+        <BookOpen className="w-5 h-5 mr-3" />
+        Learning Center
+      </Button>
+    </Link>
+    
+  </div>
+</div>
         </div>
       </div>
 
@@ -184,6 +189,12 @@ export default function Home() {
           Early detection can make all the difference. Start your assessment today and take 
           the first step towards proactive healthcare management.
         </p>
+        <Link to="/AuthPage">
+        <Button className="group relative overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 min-w-[220px] border border-blue-400/20">
+           <span className="text-lg">Get Started Now</span>
+           <ArrowRight className="w-5 h-5 ml-3" />
+        </Button>
+        </Link>
       </div>
       </div>
   );

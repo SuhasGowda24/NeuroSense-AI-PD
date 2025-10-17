@@ -8,13 +8,14 @@ import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRig
 import WelcomeCard from "../../../components/PDashboard/WelcomeCard";
 import QuickStats from "../../../components/PDashboard/QuickStats";
 import SetupProfile from "../../../components/PDashboard/SetupProfile";
+// import Medication from "../../Dashboard/Patient/Medication";
 
 //Suggestions of Learning Modules
 const modules = {
   newly_diagnosed: [
     { title: "Understanding Parkinson's", description: "Learn the basics of PD", progress: 0 },
-    { title: "Your First Steps", description: "What to do after diagnosis", progress: 0 },
-    { title: "Building Your Care Team", description: "Finding the right specialists", progress: 0 }
+  //   { title: "Your First Steps", description: "What to do after diagnosis", progress: 0 },
+  //   { title: "Building Your Care Team", description: "Finding the right specialists", progress: 0 }
   ],
   mid_stage: [
     { title: "Managing Fluctuations", description: "Dealing with on/off periods", progress: 0 },
@@ -103,7 +104,7 @@ const handleSetupComplete = (ProfileData) => {
         <QuickStats symptoms={symptoms} events={events} />
       </motion.div>
 
-      {/* Left Column - Medications */}
+      {/* Left Column - Medication*/}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <motion.div variants={item}>
               <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg hover:shadow-2xl transition-all h-full">
@@ -131,7 +132,7 @@ const handleSetupComplete = (ProfileData) => {
                     <p className="text-gray-600 mb-4">
                       Add your medications to track your schedule
                     </p><br/>
-                    <Link to="/Medication">
+                    <Link to="/medication">
                       <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                         <Plus className="w-4 h-4 mr-2" /> Add Medication
                       </Button>

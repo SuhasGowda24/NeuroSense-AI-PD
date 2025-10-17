@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, Activity, Pill, BookOpen, Map, Calendar, Heart } from 'lucide-react';
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { LayoutDashboard, Activity, Pill, Calendar, Heart } from 'lucide-react';
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import SignInButton from "./ui/signInButton";
 
 export default function NavbarPatient() {
+  const location = useLocation();
   const [activeItem, setActiveItem] = useState("Dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -12,12 +13,22 @@ export default function NavbarPatient() {
   { title: "Dashboard", icon: LayoutDashboard, path: "/patientdashboard" },
   // { title: "Symptom Tracker", icon: Activity, path: "/symptom-tracker" },
   { title: "Medications", icon: Pill, path: "/Medication" },
-  { title: "Learning", icon: BookOpen, path: "/Learning" },
+  // { title: "Learning", icon: BookOpen, path: "/Learning" },
   { title: "My Journey", icon: Calendar, path: "/journey" },
   // { title: "Local Resources", icon: Map, path: "/resources" },
   { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
 ];
 
+ useEffect(() => {
+    const current = navigationLinks.find(
+      (link) => link.path.toLowerCase() === location.pathname.toLowerCase()
+    );
+    if (current) {
+      setActiveItem(current.title);
+    } else {
+      setActiveItem("Dashboard"); // fallback default
+    }
+  }, [location.pathname]);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 

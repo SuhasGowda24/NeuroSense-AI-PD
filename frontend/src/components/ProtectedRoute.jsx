@@ -9,7 +9,6 @@ const ProtectedRoute = ({ allowedRoles }) => {
     // Not logged in
     return <Navigate to="/AuthPage" replace />;
   }
-  
   let decoded;
   try {
     // const decoded = jwtDecode(token);
@@ -17,13 +16,11 @@ const ProtectedRoute = ({ allowedRoles }) => {
   } catch (err) {
     return <Navigate to="/AuthPage" replace />;
   }
-
   const role = decoded.role;
  // If role is not in allowedRoles, redirect
   if (!allowedRoles.includes(role)) {
     return <Navigate to="/AuthPage" replace />;
   }
-
   // Role matches, render child routes
   return <Outlet />;
 };

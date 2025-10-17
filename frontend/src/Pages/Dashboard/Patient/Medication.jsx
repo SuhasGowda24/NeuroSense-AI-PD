@@ -1,14 +1,13 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Plus, Pill, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// import MedicationForm from "../components/medications/MedicationForm";
-// import MedicationCard from "../components/medications/MedicationCard";
-// import MedicationSchedule from "../components/medications/MedicationSchedule";
-// import MedicationReminders from "../components/medications/MedicationReminders";
+import MedicationForm from "../../../components/PDashboard/MedicationForm";
+import MedicationCard from "../../../components/PDashboard/MedicationCard";
+import MedicationSchedule from "../../../components/PDashboard/MedicationSchedule";
+import MedicationReminders from "../../../components/PDashboard/MedicationReminders";
 
 export default function Medication() {
   const [medications, setMedications] = useState([]);
@@ -16,21 +15,25 @@ export default function Medication() {
   const [editingMed, setEditingMed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const token = localStorage.getItem("token"); // JWT stored at login
 
   useEffect(() => {
     loadMedications();
   }, []);
 
   const loadMedications = async () => {
-    try {
       setLoading(true);
       setError(null);
-      const data = await Medication.filter({ is_active: true });
-      setMedications(data || []);
+      try {
+        const res = await fetch("/api/medications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch medications");
+      const data = await res.json();
+      setMedications(data);
     } catch (err) {
-      console.error("Error loading medications:", err);
-      setError(err.message || "Failed to load medications");
-      setMedications([]);
+      console.error(err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -39,9 +42,27 @@ export default function Medication() {
   const handleSubmit = async (medData) => {
     try {
       if (editingMed) {
-        await Medication.update(editingMed.id, medData);
+         // Update medication
+        const res = await fetch(`/api/medications/${editingMed._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(medData),
+        });
+        if (!res.ok) throw new Error("Failed to update medication");
       } else {
-        await Medication.create(medData);
+        // Create new medication
+        const res = await fetch("/api/medications", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(medData),
+        });
+        if (!res.ok) throw new Error("Failed to add medication");
       }
       setShowForm(false);
       setEditingMed(null);
@@ -58,8 +79,13 @@ export default function Medication() {
   };
 
   const handleDelete = async (medId) => {
+     if (!window.confirm("Are you sure you want to delete this medication?")) return;
     try {
-      await Medication.update(medId, { is_active: false });
+      const res = await fetch(`/api/medications/${medId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to delete medication");
       loadMedications();
     } catch (err) {
       console.error("Error deleting medication:", err);
@@ -166,7 +192,7 @@ export default function Medication() {
                     <AnimatePresence>
                       {medications.map((med, index) => (
                         <MedicationCard
-                          key={med.id}
+                          key={med._id}
                           medication={med}
                           onEdit={handleEdit}
                           onDelete={handleDelete}
