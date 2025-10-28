@@ -1,7 +1,9 @@
 import React from "react";
+import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
-import { Sparkles, MapPin, Calendar, User } from "lucide-react";
+import { Sparkles, MapPin, Calendar, User, Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const stageLabels = {
   newly_diagnosed: "Newly Diagnosed",
@@ -109,7 +111,7 @@ export default function WelcomeCard({ profile, user }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mt-6 flex flex-wrap gap-4"
+            className="mt-6 flex flex-wrap  items-center gap-4"
           >
             {profile?.location && (
               <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-5 py-2.5 shadow-lg">
@@ -131,6 +133,19 @@ export default function WelcomeCard({ profile, user }) {
                 <span className="text-sm font-medium">{profile.age} years</span>
               </div>
             )}
+  {/* Log Health Button (bottom-right corner) */}
+    <div className="flex flex-wrap gap-4 flex-1"></div>
+  <div className="ml-auto">
+  <Link to="/tracksymptoms">
+    <Button
+      size="lg"
+      className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold px-6 py-3 text-sm rounded-full inline-flex items-center gap-2 transform hover:scale-105"
+    >
+      <Plus className="w-5 h-5" />
+      Log Today's Health
+    </Button>
+  </Link>
+  </div>
           </motion.div>
         </CardContent>
       </Card>

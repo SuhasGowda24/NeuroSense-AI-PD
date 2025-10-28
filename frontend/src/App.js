@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./ScrollToTop";
 import Layout from "../src/layouts/Layouts";
 import PatientLayout from "../src/layouts/PatientLayout";
 import Home from "./Pages/Home";
@@ -10,11 +11,15 @@ import PatientDashboard from "./Pages/Dashboard/Patient/PatientDashboard";
 import Medication from "./Pages/Dashboard/Patient/Medication";
 import Learning from "./Pages/Learning";
 import AdminDashboard from "./Pages/Dashboard/Admin/AdminDashboard";
-
+import TrackSymptoms from "./Pages/Dashboard/Patient/TrackSymptoms";
+import Journey from "./Pages/Dashboard/Patient/Journey";
+import Caregiver from "./Pages/Dashboard/Patient/Caregiver";
+import Exercise from "./Pages/Dashboard/Patient/Exercise";
 
 function App() {
   return (
      <Router>
+       <ScrollToTop />
         <Routes>
           {/* Home Layout */}
         <Route element={<Layout />}>
@@ -28,6 +33,10 @@ function App() {
           <Route  element={<PatientLayout />}>
             <Route path="/patientdashboard" element={<PatientDashboard />} />
             <Route path="/medication" element={<Medication />} />
+            <Route path="/tracksymptoms" element={<TrackSymptoms />} />
+             <Route path="/journey" element={<Journey />} />
+             <Route path="/caregiver" element={<Caregiver />} />
+             <Route path="/exercise" element={<Exercise />} />
           </Route>
         </Route>
           
@@ -41,7 +50,6 @@ function App() {
            <Route path="/AuthPage" element={<AuthPage />} />
         </Routes>
     </Router>
-    
   );
 }
 

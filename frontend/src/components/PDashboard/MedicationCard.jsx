@@ -1,10 +1,10 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { Pill, Clock, Edit2, Trash2, AlertCircle } from "lucide-react";
+import { Pill, Clock, Edit2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function MedicationCard({ medication, onEdit, onDelete, index }) {
+export default function MedicationCard({ medication, onEdit, index }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,6 +37,11 @@ export default function MedicationCard({ medication, onEdit, onDelete, index }) 
                 <Badge variant="outline" className="bg-white/60">
                   Since {new Date(medication.started_date).toLocaleDateString()}
                 </Badge>
+              )} 
+              {medication.end_date && (
+                <Badge variant="outline" className="bg-white/60">
+                  Since {new Date(medication.end_date).toLocaleDateString()}
+                </Badge>
               )}
             </div>
           </div>
@@ -45,18 +50,16 @@ export default function MedicationCard({ medication, onEdit, onDelete, index }) 
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onEdit(medication)}
+            onClick={() => {
+              onEdit(medication);
+              // smooth scroll to top when edit is pressed
+              if (typeof window !== "undefined" && window.scrollTo) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
             className="hover:bg-blue-100 hover:text-blue-700 transition-colors"
           >
             <Edit2 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(medication.id)}
-            className="hover:bg-red-100 hover:text-red-700 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </div>

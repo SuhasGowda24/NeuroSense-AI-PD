@@ -8,6 +8,7 @@ import MedicationForm from "../../../components/PDashboard/MedicationForm";
 import MedicationCard from "../../../components/PDashboard/MedicationCard";
 import MedicationSchedule from "../../../components/PDashboard/MedicationSchedule";
 import MedicationReminders from "../../../components/PDashboard/MedicationReminders";
+import axiosClient from "../../../lib/axiosClient";
 
 export default function Medication() {
   const [medications, setMedications] = useState([]);
@@ -16,10 +17,29 @@ export default function Medication() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const token = localStorage.getItem("token"); // JWT stored at login
+  const [adherence, setAdherence] = useState({}); // { medId: { time: 'taken' | 'not-taken' | null } }
 
   useEffect(() => {
     loadMedications();
   }, []);
+
+  useEffect(() => {
+  const fetchAdherence = async () => {
+    try {
+      const response = await axiosClient.get('/medications/logs');
+      const logs = response.data;
+      const adherenceMap = {};
+      logs.forEach(log => {
+        if (!adherenceMap[log.medId]) adherenceMap[log.medId] = {};
+        adherenceMap[log.medId][log.time] = log.status;
+      });
+      setAdherence(adherenceMap);
+    } catch (error) {
+      console.error('Error fetching adherence logs:', error);
+    }
+  };
+  fetchAdherence();
+}, []);
 
   const loadMedications = async () => {
       setLoading(true);
@@ -203,19 +223,20 @@ export default function Medication() {
                   </CardContent>
                 </Card>
 
-                <MedicationSchedule medications={medications} />
+                <MedicationSchedule adherence={adherence} setAdherence={setAdherence} />
               </>
             )}
           </div>
 
           <div className="space-y-6">
-            <MedicationReminders medications={medications} />
+            <MedicationReminders medications={medications} adherence={adherence} />
+
             
             <Card className="border-none shadow-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white">
               <CardContent className="p-6">
                 <AlertCircle className="w-10 h-10 mb-4" />
                 <h3 className="text-lg font-bold mb-2">Important Reminder</h3>
-                <p className="text-sm text-amber-100 leading-relaxed">
+                <p className="text-sm text-white leading-relaxed">
                   Never stop or change your medications without consulting your neurologist. Always follow your prescribed schedule.
                 </p>
               </CardContent>

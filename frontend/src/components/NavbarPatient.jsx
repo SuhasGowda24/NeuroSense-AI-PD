@@ -16,7 +16,7 @@ export default function NavbarPatient() {
   // { title: "Learning", icon: BookOpen, path: "/Learning" },
   { title: "My Journey", icon: Calendar, path: "/journey" },
   // { title: "Local Resources", icon: Map, path: "/resources" },
-  { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
+  { title: "Caregiver Corner", icon: Heart, path: "/Caregiver" },
 ];
 
  useEffect(() => {

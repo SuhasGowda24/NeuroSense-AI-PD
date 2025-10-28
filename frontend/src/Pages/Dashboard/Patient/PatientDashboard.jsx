@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
-import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRight, Sparkles } from "lucide-react";
+import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRight, Sparkles, Dumbbell } from "lucide-react";
 import WelcomeCard from "../../../components/PDashboard/WelcomeCard";
 import QuickStats from "../../../components/PDashboard/QuickStats";
 import SetupProfile from "../../../components/PDashboard/SetupProfile";
-// import Medication from "../../Dashboard/Patient/Medication";
+import HealthGraph from "../../../components/PDashboard/HealthGraph";
+import { useSymptomLogs } from "../../../hooks/useSymptomLogs";
+import MedicationSchedule from "../../../components/PDashboard/MedicationSchedule";
 
 //Suggestions of Learning Modules
 const modules = {
@@ -34,7 +36,6 @@ const modules = {
   ]
 };
 
-
 //Framer Motion Variants
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
@@ -45,9 +46,47 @@ export default function PatientDashboard() {
   const [profile, setProfile] = useState(null);
   const [showSetup, setShowSetup] = useState(false);
   const [symptoms] = useState([]);
-  const [events] = useState([]);
+  const [events, setEvents] = useState([]);
   const token = localStorage.getItem("token"); // JWT stored at login
-  
+  const [medications, setMedications] = useState([]);
+  useEffect(() => {
+  const fetchMedications = async () => {
+    try {
+      const res = await fetch("/api/medications", {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMedications(data);
+        // fetch journey events for quick stats
+        const fetchEvents = async () => {
+          try {
+            const res = await fetch("/api/journey", {
+              headers: { "Authorization": `Bearer ${token}` },
+            });
+            if (res.ok) {
+              const data = await res.json();
+              setEvents(data);
+            }
+          } catch (error) {
+            console.error("Error fetching journey events:", error);
+          }
+        };
+
+        fetchEvents();
+      }
+    } catch (error) {
+      console.error("Error fetching medications:", error);
+    }
+  };
+
+  if (token) {
+    fetchMedications();
+  }
+}, [token]);
+
+
+
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
@@ -87,6 +126,8 @@ const handleSetupComplete = (ProfileData) => {
     setShowSetup(false);
   };
 
+  const { data: symptomLogs = [] } = useSymptomLogs(7); // last 7 logs
+
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
@@ -101,13 +142,18 @@ const handleSetupComplete = (ProfileData) => {
     
       {/* Quick Stats */}
       <motion.div variants={item}>
-        <QuickStats symptoms={symptoms} events={events} />
+        <QuickStats symptoms={symptomLogs} events={events} medications={medications} />
       </motion.div>
+      
+      <div className="lg:col-span-2">
+        <HealthGraph symptomLogs={symptomLogs} />
+        </div>
+
 
       {/* Left Column - Medication*/}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6">
             <motion.div variants={item}>
-              <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg hover:shadow-2xl transition-all h-full">
+               <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg hover:shadow-2xl transition-all">
                 <CardHeader className="border-b border-teal-50">
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -117,27 +163,31 @@ const handleSetupComplete = (ProfileData) => {
                       <span>Today's Medications</span>
                     </div>
                     <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                      0 doses
+                      {medications.length} medications
                     </Badge>
                   </CardTitle>
+                  <Link to="/Medication">
+                      <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                      <Plus className="w-4 h-4 mr-2" /> Add Medication
+                      </Button>
+                      </Link>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
-                      <Pill className="w-10 h-10 text-blue-400" />
-                    </div><br/>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No medications yet
-                    </h3><br/>
-                    <p className="text-gray-600 mb-4">
-                      Add your medications to track your schedule
-                    </p><br/>
-                    <Link to="/medication">
-                      <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                        <Plus className="w-4 h-4 mr-2" /> Add Medication
-                      </Button>
-                    </Link>
-                  </div>
+                  {medications.length > 0 ? (
+                    <MedicationSchedule medications={medications} />
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                        <Pill className="w-10 h-10 text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        No medications yet
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        Add your medications to track your schedule
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -197,6 +247,38 @@ const handleSetupComplete = (ProfileData) => {
                     </div>
                   </div>
                 </Link>
+<div className="mb-4"></div>
+                <Link to="/Exercise">
+  <div className="p-4 rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-rose-50 border border-purple-100 hover:border-purple-300 transition-all duration-200 group cursor-pointer">
+    <div className="flex items-start justify-between mb-3">
+      <div className="flex-1">
+        <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">
+          Exercise
+        </h4>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Practice your skills with interactive exercises
+        </p>
+      </div>
+      <div className="w-10 h-10 rounded-lg bg-white/60 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
+        <Dumbbell className="w-5 h-5 text-purple-600" />
+      </div>
+    </div>
+    <div className="flex items-center justify-between">
+      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden mr-3">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+          initial={{ width: 0 }}
+          animate={{ width: "0%" }}
+          transition={{ duration: 1, delay: 0.5 }}
+        />
+      </div>
+      <Button variant="ghost" size="sm" className="text-purple-700 hover:text-purple-800 hover:bg-purple-100 group-hover:translate-x-1 transition-all">
+        Start
+        <ArrowRight className="w-4 h-4 ml-2" />
+      </Button>
+    </div>
+  </div>
+</Link>
               </motion.div>
             ))}
           </CardContent>

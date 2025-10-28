@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -19,8 +19,26 @@ export default function MedicationForm({ medication, onSubmit, onCancel }) {
     purpose: "",
     side_effects: [],
     started_date: "",
+    end_date: "",
     notes: ""
   });
+
+  useEffect(() => {
+  if (medication) {
+    setFormData({
+      name: medication.name || "",
+      dosage: medication.dosage || "",
+      frequency: medication.frequency || "",
+      times: medication.times || [],
+      with_food: medication.with_food || false,
+      purpose: medication.purpose || "",
+      side_effects: medication.side_effects || [],
+      started_date: medication.started_date || "",
+      end_date: medication.end_date || "",
+      notes: medication.notes || "",
+    });
+  }
+}, [medication]);
 
   const [newTime, setNewTime] = useState("");
   const [newSideEffect, setNewSideEffect] = useState("");
@@ -126,7 +144,7 @@ export default function MedicationForm({ medication, onSubmit, onCancel }) {
                   Add
                 </Button>
               </div>
-              {formData.times.length > 0 && (
+              {formData?.times?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {formData.times.map((time, idx) => (
                     <Badge
@@ -171,7 +189,7 @@ export default function MedicationForm({ medication, onSubmit, onCancel }) {
                   Add
                 </Button>
               </div>
-              {formData.side_effects.length > 0 && (
+              {formData?.side_effects?.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {formData.side_effects.map((effect, idx) => (
                     <Badge
@@ -194,6 +212,15 @@ export default function MedicationForm({ medication, onSubmit, onCancel }) {
                   type="date"
                   value={formData.started_date}
                   onChange={(e) => setFormData({...formData, started_date: e.target.value})}
+                  className="h-11"
+                />
+              </div>
+               <div className="space-y-2">
+                <Label className="font-semibold">End Date</Label>
+                <Input
+                  type="date"
+                  value={formData.end_date}
+                  onChange={(e) => setFormData({...formData, end_date: e.target.value})}
                   className="h-11"
                 />
               </div>

@@ -1,11 +1,12 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
-import { Activity, Calendar, TrendingUp } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { Activity, Calendar, Pill } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function QuickStats({ symptoms, events }) {
+export default function QuickStats({ symptoms, events, medications = [] }) {
   const getAverageSymptomSeverity = () => {
-    if (symptoms.length === 0) return 0;
+    if (!Array.isArray(symptoms) || symptoms.length === 0) return 0;
     const total = symptoms.reduce((sum, s) => {
       const avg =
         ((s.tremor_severity || 0) +
@@ -17,6 +18,13 @@ export default function QuickStats({ symptoms, events }) {
     return (total / symptoms.length).toFixed(1);
   };
 
+  const uniqueDaysCount = Array.isArray(symptoms)
+    ? new Set(symptoms.map((s) => s.date)).size
+    : 0;
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const hasLoggedToday = Array.isArray(symptoms) && symptoms.some((s) => s.date === todayStr);
+
   const stats = [
     {
       title: "Symptom Logs",
@@ -26,6 +34,14 @@ export default function QuickStats({ symptoms, events }) {
       color: "from-teal-500 to-cyan-500",
       bgColor: "bg-teal-50",
     },
+      {
+      title: "Medication",
+  value: medications.length,
+      subtitle: "Medicine tracked",
+      icon: Pill,
+      color: "from-blue-500 to-blue-500",
+      bgColor: "bg-blue-50",
+     },
     {
       title: "Journey Events",
       value: events.length,
@@ -34,14 +50,15 @@ export default function QuickStats({ symptoms, events }) {
       color: "from-purple-500 to-pink-500",
       bgColor: "bg-purple-50",
     },
-    {
-      title: "Avg Symptom Level",
-      value: getAverageSymptomSeverity(),
-      subtitle: "Out of 10",
-      icon: TrendingUp,
-      color: "from-orange-500 to-red-500",
-      bgColor: "bg-orange-50",
-    }
+
+    // {
+    //   title: "Avg Symptom Level",
+    //   value: getAverageSymptomSeverity(),
+    //   subtitle: "Out of 10",
+    //   icon: TrendingUp,
+    //   color: "from-orange-500 to-red-500",
+    //   bgColor: "bg-orange-50",
+    // }
   ];
 
   return (
@@ -83,6 +100,24 @@ export default function QuickStats({ symptoms, events }) {
                       {stat.title}
                     </div>
                     <div className="text-xs text-gray-500">{stat.subtitle}</div>
+                    {stat.title === 'Medication' && (
+                      <div className="mt-2">
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                          {medications.length} {medications.length === 1 ? 'medication' : 'medications'}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {stat.title === 'Symptom Logs' && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-teal-100 text-teal-700">
+                          {uniqueDaysCount} {uniqueDaysCount === 1 ? 'day logged' : 'days logged'}
+                        </Badge>
+                        <Badge className={`${hasLoggedToday ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                          {hasLoggedToday ? 'Logged today' : 'Not logged today'}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

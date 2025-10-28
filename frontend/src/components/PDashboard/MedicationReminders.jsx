@@ -4,29 +4,30 @@ import { Badge } from "../ui/badge";
 import { Bell, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function MedicationReminders({ medications }) {
-  const getUpcomingReminders = () => {
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
-    const reminders = [];
-    medications.forEach(med => {
-      if (med.times && med.times.length > 0) {
-        med.times.forEach(time => {
-          if (time > currentTime) {
-            reminders.push({ medication: med, time });
-          }
-        });
-      }
-    });
+export default function MedicationReminders({ medications, adherence }) {
+ const getUpcomingReminders = () => {
+  const now = new Date();
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  
+  const reminders = [];
+  medications.forEach(med => {
+    const medId = med._id || med.id;
+    if (med.times && med.times.length > 0) {
+      med.times.forEach(time => {
+        if (time > currentTime && adherence[medId]?.[time] !== 'taken') {
+          reminders.push({ medication: med, time });
+        }
+      });
+    }
+  });
 
-    return reminders.sort((a, b) => a.time.localeCompare(b.time)).slice(0, 3);
-  };
+  return reminders.sort((a, b) => a.time.localeCompare(b.time)).slice(0, 3);
+};
 
   const upcomingReminders = getUpcomingReminders();
 
   return (
-    <Card className="border-none shadow-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white">
+    <Card className="border-none shadow-xl bg-gradient-to-br from-red-950 to-red-700 text-white">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="w-5 h-5" />
