@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
-import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRight, Sparkles, Dumbbell } from "lucide-react";
+import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRight, Sparkles, Dumbbell, Users } from "lucide-react";
 import WelcomeCard from "../../../components/PDashboard/WelcomeCard";
 import QuickStats from "../../../components/PDashboard/QuickStats";
 import SetupProfile from "../../../components/PDashboard/SetupProfile";
@@ -221,7 +221,7 @@ const handleSetupComplete = (ProfileData) => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-teal-700 transition-colors">
-                          {module.title}
+                          Learning Module
                         </h4>
                         <p className="text-sm text-gray-600 leading-relaxed">
                           {module.description}
@@ -279,7 +279,75 @@ const handleSetupComplete = (ProfileData) => {
     </div>
   </div>
 </Link>
-              </motion.div>
+
+<div className="mb-4"></div>
+
+ <Link to="/Community">
+  <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border border-amber-100 hover:border-amber-300 transition-all duration-200 group cursor-pointer">
+    <div className="flex items-start justify-between mb-3">
+      <div className="flex-1">
+        <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-amber-700 transition-colors">
+          Community
+        </h4>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Connect with others and share experiences
+        </p>
+      </div>
+      <div className="w-10 h-10 rounded-lg bg-white/60 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+        <Users className="w-5 h-5 text-amber-600" />
+      </div>
+    </div>
+    <div className="flex items-center justify-between">
+      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden mr-3">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-amber-500 to-orange-500"
+          initial={{ width: 0 }}
+          animate={{ width: "0%" }}
+          transition={{ duration: 1, delay: 0.5 }}
+        />
+      </div>
+      <Button variant="ghost" size="sm" className="text-amber-700 hover:text-amber-800 hover:bg-amber-100 group-hover:translate-x-1 transition-all">
+        Join
+        <ArrowRight className="w-4 h-4 ml-2" />
+      </Button>
+    </div>
+  </div>
+</Link>
+
+{/* <div className="mb-4"></div>
+
+<Link to="/Appointments">
+  <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-50 via-blue-50 to-sky-50 border border-indigo-100 hover:border-indigo-300 transition-all duration-200 group cursor-pointer">
+    <div className="flex items-start justify-between mb-3">
+      <div className="flex-1">
+        <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-indigo-700 transition-colors">
+          Appointments
+        </h4>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Schedule and manage your healthcare appointments
+        </p>
+      </div>
+      <div className="w-10 h-10 rounded-lg bg-white/60 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+        <Calendar className="w-5 h-5 text-indigo-600" />
+      </div>
+    </div>
+    <div className="flex items-center justify-between">
+      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden mr-3">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-indigo-500 to-blue-500"
+          initial={{ width: 0 }}
+          animate={{ width: "0%" }}
+          transition={{ duration: 1, delay: 0.5 }}
+        />
+      </div>
+      <Button variant="ghost" size="sm" className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-100 group-hover:translate-x-1 transition-all">
+        Book
+        <ArrowRight className="w-4 h-4 ml-2" />
+      </Button>
+    </div>
+  </div>
+</Link> */}
+          </motion.div>
             ))}
           </CardContent>
         </Card>

@@ -36,7 +36,7 @@ export default function QuickStats({ symptoms, events, medications = [] }) {
     },
       {
       title: "Medication",
-  value: medications.length,
+      value: medications.length,
       subtitle: "Medicine tracked",
       icon: Pill,
       color: "from-blue-500 to-blue-500",
@@ -100,16 +100,10 @@ export default function QuickStats({ symptoms, events, medications = [] }) {
                       {stat.title}
                     </div>
                     <div className="text-xs text-gray-500">{stat.subtitle}</div>
-                    {stat.title === 'Medication' && (
-                      <div className="mt-2">
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                          {medications.length} {medications.length === 1 ? 'medication' : 'medications'}
-                        </Badge>
-                      </div>
-                    )}
+
 
                     {stat.title === 'Symptom Logs' && (
-                      <div className="mt-2 flex items-center gap-2">
+                       <div className="absolute top-4 right-4 flex items-center gap-2">
                         <Badge variant="secondary" className="bg-teal-100 text-teal-700">
                           {uniqueDaysCount} {uniqueDaysCount === 1 ? 'day logged' : 'days logged'}
                         </Badge>
