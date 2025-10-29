@@ -23,9 +23,9 @@ export default function Footer() {
     const footerLinks = {
         platform: [
             { name: 'Home', path: "/" },
-            { name: 'Take Assessment', path: "/assignment" },
+            { name: 'Take Assessment', path: "/AuthPage" },
             { name: 'How It Works', },
-            { name: 'Research',}
+            // { name: 'Research',}
         ],
         support: [
             { name: 'Help Center', icon: HelpCircle },

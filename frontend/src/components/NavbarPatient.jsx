@@ -3,24 +3,28 @@ import { LayoutDashboard, Activity, Pill, Calendar, Heart, Brain } from 'lucide-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import SignInButton from "./ui/signInButton";
+import SignOutButton from "./ui/signOutButton";
 
 export default function NavbarPatient() {
   const location = useLocation();
   const [activeItem, setActiveItem] = useState("Dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-   const navigationLinks = [
-  { title: "Dashboard", icon: LayoutDashboard, path: "/patientdashboard" },
-  // { title: "Symptom Tracker", icon: Activity, path: "/symptom-tracker" },
-  { title: "Medications", icon: Pill, path: "/Medication" },
-  // { title: "Learning", icon: BookOpen, path: "/Learning" },
-  { title: "My Journey", icon: Calendar, path: "/journey" },
-  // { title: "Local Resources", icon: Map, path: "/resources" },
-  { title: "Caregiver Corner", icon: Heart, path: "/Caregiver" },
-  { title: "AI Assessment", icon: Brain, path: "/AIAssessment" },
-];
+  const navigationLinks = [
+    { title: "Dashboard", icon: LayoutDashboard, path: "/patientdashboard" },
+    { title: "Medications", icon: Pill, path: "/medication" },
+    { title: "My Journey", icon: Calendar, path: "/journey" },
+    { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
+    { title: "AI Assessment", icon: Brain, path: "/aiassessment" },
+  ];
 
- useEffect(() => {
+  // update login state when location changes (simple heuristic)
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("token"));
+  }, [location.pathname]);
+
+  useEffect(() => {
     const current = navigationLinks.find(
       (link) => link.path.toLowerCase() === location.pathname.toLowerCase()
     );
@@ -39,21 +43,16 @@ export default function NavbarPatient() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Navbar Top Row */}
           <div className="flex justify-between items-center h-16">
-             <Link
-            to="/"
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              {/* Logo */}
               <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/20">
                 <Activity className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h2 className="font-bold text-gray-900 text-lg">PD Care</h2>
-                <p className="text-xs text-teal-600 font-medium -mt-1">
-                  Your Parkinson's Support
-                </p>
+                <p className="text-xs text-teal-600 font-medium -mt-1">Your Parkinson's Support</p>
               </div>
-              </Link>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1">
@@ -63,17 +62,18 @@ export default function NavbarPatient() {
                   to={link.path}
                   onClick={() => setActiveItem(link.title)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    activeItem === link.title 
-                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md shadow-teal-500/20'
-                     : 'text-gray-700 hover:text-teal-600 hover:bg-teal-50'
+                    activeItem === link.title
+                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md shadow-teal-500/20'
+                      : 'text-gray-700 hover:text-teal-600 hover:bg-teal-50'
                   }`}
-                  >
-                    <link.icon className="w-4 h-4" />
-                    <span className="text-sm">{link.title}</span>
+                >
+                  <link.icon className="w-4 h-4" />
+                  <span className="text-sm">{link.title}</span>
                 </Link>
               ))}
-                 {/* User + Sign In */}
-                  <SignInButton />
+
+              {/* User: show Logout when logged in, otherwise Sign In */}
+              {isLoggedIn ? <SignOutButton /> : <SignInButton />}
             </div>
 
             {/* Mobile Menu Button */}
@@ -109,7 +109,7 @@ export default function NavbarPatient() {
                   <Link
                     key={link.title}
                     to={link.path}
-                    onClick={() => { 
+                    onClick={() => {
                       setActiveItem(link.title);
                       setIsMobileMenuOpen(false);
                     }}
@@ -123,8 +123,8 @@ export default function NavbarPatient() {
                     <span className="font-medium">{link.title}</span>
                   </Link>
                 ))}
-                {/* Sign In for Mobile */}
-                <SignInButton />
+                {/* Sign In / Logout for Mobile */}
+                {isLoggedIn ? <SignOutButton /> : <SignInButton />}
               </div>
             </div>
           )}

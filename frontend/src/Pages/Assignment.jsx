@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { TrendingUp, TrendingDown, CalendarCheck2, Lightbulb, PlayCircle, BrainCircuit, HeartHandshake, User, BookOpen, Activity } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 
 const ModuleCard = ({ title, description, icon: Icon, onClick }) => {
@@ -47,12 +48,15 @@ export default function Home() {
             </div>
           </div> */}
           <div className="flex flex-col gap-4 w-full max-w-xs">
+            <Link to="/AuthPage">
             <Button size="lg" className="rounded-xl shadow-md" >
               Start My Journey
             </Button>
+            <div className="mb-4"></div>
             <Button size="lg" variant="outline" className="rounded-xl" >
               Caregiver Guide
             </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -78,7 +82,7 @@ export default function Home() {
                     <CardTitle className="text-base font-medium text-gray-600">Medication Adherence</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <span className="text-2xl font-bold text-green-600">90%</span>
+                    <span className="text-2xl font-bold text-green-600">74%</span>
                 </CardContent>
               </Card>
               <Card className="p-4 shadow-sm bg-blue-50 border-blue-200">
@@ -90,9 +94,11 @@ export default function Home() {
                 </CardContent>
               </Card>
               <div className="flex items-center justify-center">
+                <Link to="/AuthPage">
                 <Button className="w-full" >
                   Add Today’s Symptoms
                 </Button>
+                </Link>
               </div>
             </div>
         </div>

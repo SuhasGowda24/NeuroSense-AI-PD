@@ -18,7 +18,7 @@ export default function NavbarHome() {
   ];
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const handleLanguageChange = (lang) => setCurrentLang(lang);
+  // const handleLanguageChange = (lang) => setCurrentLang(lang);
 
     useEffect(() => {
     const current = navigationLinks.find(
@@ -65,7 +65,7 @@ export default function NavbarHome() {
             ))}
 
             {/* 🌐 Language Dropdown */}
-            <div className="relative">
+            {/* <div className="relative">
               <button
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="flex items-center gap-2 px-3 py-2 border rounded-md bg-white shadow-sm hover:bg-gray-50"
@@ -92,7 +92,7 @@ export default function NavbarHome() {
                     ))}
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* 👤 User + Sign In */}
           <SignInButton />
@@ -140,7 +140,7 @@ export default function NavbarHome() {
               ))}
 
               {/* 🌐 Mobile Language Selector */}
-              <div className="flex flex-col gap-2 border-t pt-2">
+              {/* <div className="flex flex-col gap-2 border-t pt-2">
                 <p className="text-sm font-medium text-gray-600">Language</p>
                 <div className="flex gap-2">
                   {["English", "Kannada", "Hindi"].map((lang) => (
@@ -157,7 +157,7 @@ export default function NavbarHome() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* 👤 Sign In for Mobile */}
               <SignInButton />
