@@ -39,8 +39,8 @@ export default function Admin() {
     setTimeout(() => {
       // Mock data instead of base44 fetch
       setStats({
-        totalUsers: 120,
-        totalTests: 540,
+        totalUsers: 10,
+        totalTests: 30,
         datasets: 12,
         activeSessions: 34,
       });

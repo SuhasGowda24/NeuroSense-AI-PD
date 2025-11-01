@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Heart, Activity, Globe, BookOpen } from "lucide-react";
+import { Heart, Activity, BookOpen, House } from "lucide-react";
 import SignInButton from "./ui/signInButton";
 
 export default function NavbarHome() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("English");
-  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  // const [currentLang, setCurrentLang] = useState("English");
+  // const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState("Home");
   const location = useLocation(); 
 
   const navigationLinks = [
-    { name: "Home", path: "/" },
+    { name: "Home", path: "/", icon: House },
     { name: "Assessment", path: "/assignment", icon: Activity },
     { name: "Learning", path: "/Learning", icon: BookOpen },
   ];

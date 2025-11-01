@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { User, Lock, Mail, Brain, Plus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { User, Lock, Mail, Brain, Plus, ArrowLeft } from "lucide-react";
+import { Button } from "../components/ui/button";
 import "../styles/style.css";
 
 export default function AuthPage() {
@@ -104,6 +105,14 @@ export default function AuthPage() {
 
   return (
     <div className="auth-container">
+      <div className="mb-auto">   
+        <Link to="/">
+          <Button variant="ghost" className="mb-4">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+        </Link>
+      </div>
       {/* Desktop View */}
       <div className="auth-box mobile-hide">
         {/* Forms Container */}

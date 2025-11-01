@@ -1,36 +1,14 @@
 import React from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { TrendingUp, TrendingDown, CalendarCheck2, Lightbulb, PlayCircle, BrainCircuit, HeartHandshake, User, BookOpen, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Lightbulb } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 
-const ModuleCard = ({ title, description, icon: Icon, onClick }) => {
-    return (
-        <div onClick={onClick} className="h-full border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center text-center bg-white">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Icon className="w-8 h-8 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-            <p className="text-sm text-gray-500 mt-1">{description}</p>
-        </div>
-    );
-};
-
 export default function Home() {
-
-    const modules = [
-        { title: 'My Journey', description: '(Timeline, milestones, export)', icon: User },
-        { title: 'Learn About PD', description: '(Basics, symptoms, treatments)', icon: BookOpen},
-        { title: 'Symptom Tracker', description: '(Interactive charts)', icon: Activity},
-        { title: 'My Medications', description: '(Planner / reminders)', icon: CalendarCheck2},
-        { title: 'Decision Tools', description: '(What-if simulator, self-check)', icon: BrainCircuit },
-        { title: 'Caregiver Corner', description: '(Stress, self-care, guides)', icon: HeartHandshake }
-    ];
 
     return (
     <div className="bg-white text-gray-800">
-      
       {/* Hero Section */}
       <section className="bg-blue-50 text-center py-20 px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 text-gray-900 tracking-tight">
@@ -103,21 +81,6 @@ export default function Home() {
             </div>
         </div>
       </section>
-
-      {/* Modules */}
-      <section className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-10 text-gray-800">
-              Explore Our Platform
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {modules.map((module) => (
-                <ModuleCard key={module.title} {...module} />
-              ))}
-            </div>
-        </div>
-      </section>
-
     </div>
   );
 }
