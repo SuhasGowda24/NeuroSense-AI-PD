@@ -1,8 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import NavbarHome from "../components/NavbarHome";
-// import NavbarPatient from "../components/NavbarPatient";
-// import NavbarAdmin from "../components/NavbarAdmin";
 import Footer from "../components/Footer";
 
 export default function Layout() {

@@ -83,7 +83,7 @@ export default function Footer() {
           {/* Scroll to Top Button */}
      <button
   onClick={scrollToTop}
-  className={`fixed bottom-8 right-8 z-50 transition-all duration-300 ease-in-out 
+  className={`fixed bottom-20 right-8 z-50 transition-all duration-300 ease-in-out 
   ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
   aria-label="Scroll to top"
 >

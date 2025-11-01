@@ -253,9 +253,9 @@
 }
 
 /*----- ScrollUp Button -----*/
-.scroll-button {
+/* .scroll-button {
   position: fixed;
-  bottom: 2rem;
+  bottom: 12rem;
   right: 2rem;
   background: none;
   border: none;
@@ -309,7 +309,7 @@
   color: white;
   width: 24px;
   height: 24px;
-}
+} */
 
 /*----- Authentication Page ----- */
 .auth-container {

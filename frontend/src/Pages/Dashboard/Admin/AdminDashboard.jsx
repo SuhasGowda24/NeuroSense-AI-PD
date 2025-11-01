@@ -16,12 +16,12 @@ import {
 import { motion } from "framer-motion";
 
 import UserManagement from "../../../components/AdminDashboard/UserManagement";
-// import DatasetManagement from "../components/admin/DatasetManagement";
-// import AnalyticsDashboard from "../components/admin/AnalyticsDashboard";
-// import ModelPerformance from "../components/admin/ModelPerformance";
-// import SystemLogs from "../components/admin/SystemLogs";
-// import FeedbackManagement from "../components/admin/FeedbackManagement";
-// import SystemSettings from "../components/admin/SystemSettings";
+import DatasetManagement from "../../../components/AdminDashboard/DatasetManagement";
+import AnalyticsDashboard from "../../../components/AdminDashboard/AnalyticsDashboard";
+import ModelPerformance from "../../../components/AdminDashboard/ModelPerformance";
+import SystemLogs from "../../../components/AdminDashboard/SystemLogs";
+import FeedbackManagement from "../../../components/AdminDashboard/FeedbackManagement";
+import SystemSettings from "../../../components/AdminDashboard/SystemSettings";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -236,12 +236,12 @@ export default function Admin() {
           )}
 
           {activeTab === "users" && <UserManagement />}
-          {/* {activeTab === "datasets" && <DatasetManagement />}
+          {activeTab === "datasets" && <DatasetManagement />}
           {activeTab === "analytics" && <AnalyticsDashboard />}
           {activeTab === "models" && <ModelPerformance />}
           {activeTab === "logs" && <SystemLogs />}
           {activeTab === "feedback" && <FeedbackManagement />}
-          {activeTab === "settings" && <SystemSettings />} */}
+          {activeTab === "settings" && <SystemSettings />}
         </motion.div>
       </motion.div>
     </div>

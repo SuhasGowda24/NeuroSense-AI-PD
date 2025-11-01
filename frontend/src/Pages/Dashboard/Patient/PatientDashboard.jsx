@@ -94,13 +94,6 @@ export default function PatientDashboard() {
     return () => clearTimeout(timer);
   }, []);
 
-    useEffect(() => {
-    const storedUser = localStorage.getItem("user"); // e.g., set after signup/login
-    if (storedUser) {
-      setUser(JSON.parse(storedUser)); // instantly show name
-    }
-  }, []);
-
   // Fetch Profile Data
   useEffect(() => {
   const fetchProfile = async () => {
@@ -112,6 +105,7 @@ export default function PatientDashboard() {
 
       const data = await res.json();
       setProfile(data); // Save profile data to local
+      setUser(data.userId); // Set user to the populated user object (includes username)
       
       if (!data.stage) setShowSetup(true); // show setup if incomplete
     } catch (error) {

@@ -20,7 +20,7 @@ const stageColors = {
 };
 
 export default function WelcomeCard({ profile, user }) {
-  const name = profile?.name || user?.name || "";
+  const name = user?.username || profile?.userId?.username || "";
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good Morning";
@@ -79,7 +79,7 @@ export default function WelcomeCard({ profile, user }) {
                 transition={{ delay: 0.3 }}
                 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 tracking-tight"
               >
-                Welcome {name}
+                Welcome, {name}
               </motion.h1>
               <motion.p 
                 initial={{ opacity: 0, x: -20 }}

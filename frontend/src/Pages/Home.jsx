@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import Typewriter from "../components/Typewriter";
 import { Activity, 
     Brain, 
     Shield, 
@@ -37,7 +38,6 @@ export default function Home() {
     }
   ];
 
-
   const benefits = [
     "Quick 5-minute assessment",
     "Immediate AI-powered results",
@@ -47,6 +47,16 @@ export default function Home() {
     "Mobile and desktop compatible"
   ];
 
+   const phrases = [
+    "Detection & Assessment",
+    "Learning and Awareness Hub",
+    "Daily Symptom Tracking",
+    "Medication Management",
+    "AI-Powered Insights",
+    "Personalized Health Journey",
+    "Community and Caregiver Support",
+    "Exercise and Wellness Guidance",
+  ];
 
   return (
     <div className="home-container">
@@ -59,11 +69,14 @@ export default function Home() {
             <div id="heart"></div>
           </div>
 
+    <h1 className="hero-title text-3xl md:text-4xl font-bold text-center">
+      Early Parkinson's <br />
+      <span className="text-indigo-600">
+        <Typewriter phrases={phrases} />
+      </span>
+    </h1>
 
-          <h1 className="hero-title">
-            Early Parkinson's <br />
-            <span>Detection Platform</span>
-          </h1>
+
           <p className="hero-subtitle">
             Revolutionary AI-powered handwriting analysis for early detection of Parkinson's disease. 
             Simple, accurate, and accessible screening that could save lives through early intervention.
@@ -104,10 +117,6 @@ export default function Home() {
   {features.map((feature, index) => {
     const Icon = feature.icon;
 
-  // // Map each index to a specific page
-  // const cardLinks = ["/card1", "/card2", "/card3", "/card4"];
-  // const link = cardLinks[index] || "/";
-
   return (
     <div key={index}  className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
       <CardHeader className="text-center pb-2">
@@ -134,7 +143,7 @@ export default function Home() {
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">Why Choose Our Platform?</h2>
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
               Experience the most advanced, user-friendly Parkinson's screening technology 
-              available today. Trusted by medical professionals worldwide.
+              available today.
             </p>
             
             <div className="space-y-4">
