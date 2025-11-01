@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
-import { Activity, Pill, BookOpen, Plus, Heart, ChevronRight, Calendar, ArrowRight, Sparkles, Dumbbell, Users } from "lucide-react";
+import { Pill, BookOpen, Plus, Heart, ArrowRight, Sparkles, Dumbbell, Users, CalendarClock } from "lucide-react";
 import WelcomeCard from "../../../components/PDashboard/WelcomeCard";
 import QuickStats from "../../../components/PDashboard/QuickStats";
 import SetupProfile from "../../../components/PDashboard/SetupProfile";
@@ -45,10 +46,11 @@ export default function PatientDashboard() {
   const [ user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [showSetup, setShowSetup] = useState(false);
-  const [symptoms] = useState([]);
+  // const [symptoms] = useState([]);
   const [events, setEvents] = useState([]);
   const token = localStorage.getItem("token"); // JWT stored at login
   const [medications, setMedications] = useState([]);
+   const navigate = useNavigate();
   useEffect(() => {
   const fetchMedications = async () => {
     try {
@@ -313,40 +315,6 @@ const handleSetupComplete = (ProfileData) => {
     </div>
   </div>
 </Link>
-
-{/* <div className="mb-4"></div>
-
-<Link to="/Appointments">
-  <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-50 via-blue-50 to-sky-50 border border-indigo-100 hover:border-indigo-300 transition-all duration-200 group cursor-pointer">
-    <div className="flex items-start justify-between mb-3">
-      <div className="flex-1">
-        <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-indigo-700 transition-colors">
-          Appointments
-        </h4>
-        <p className="text-sm text-gray-600 leading-relaxed">
-          Schedule and manage your healthcare appointments
-        </p>
-      </div>
-      <div className="w-10 h-10 rounded-lg bg-white/60 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-        <Calendar className="w-5 h-5 text-indigo-600" />
-      </div>
-    </div>
-    <div className="flex items-center justify-between">
-      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden mr-3">
-        <motion.div 
-          className="h-full bg-gradient-to-r from-indigo-500 to-blue-500"
-          initial={{ width: 0 }}
-          animate={{ width: "0%" }}
-          transition={{ duration: 1, delay: 0.5 }}
-        />
-      </div>
-      <Button variant="ghost" size="sm" className="text-indigo-700 hover:text-indigo-800 hover:bg-indigo-100 group-hover:translate-x-1 transition-all">
-        Book
-        <ArrowRight className="w-4 h-4 ml-2" />
-      </Button>
-    </div>
-  </div>
-</Link> */}
           </motion.div>
             ))}
           </CardContent>
@@ -371,35 +339,44 @@ const handleSetupComplete = (ProfileData) => {
       </motion.div>
 
 </div>
-      {/* Quick Actions */}
-      <motion.div variants={item}>
-        <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">
-          <CardHeader className="border-b border-teal-50">
-            <CardTitle className="text-base flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center">
-                <Activity className="w-4 h-4 text-white" />
-              </div>
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 space-y-2">
-            <Button variant="outline" className="w-full justify-start group hover:bg-purple-50 hover:border-purple-300">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-3 group-hover:bg-purple-200">
-                <Calendar className="w-4 h-4 text-purple-600" />
-              </div>
-              <span className="flex-1 text-left font-medium">Add Journey Event</span>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+       {/* Quick Actions Bar */}
+        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => navigate("/medication")}
+            >
+              <Pill className="w-6 h-6 mb-2 text-purple-600" />
+              <span className="text-sm">Medications</span>
             </Button>
-            <Button variant="outline" className="w-full justify-start group hover:bg-blue-50 hover:border-blue-300">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center mr-3 group-hover:bg-blue-200">
-                <BookOpen className="w-4 h-4 text-blue-600" />
-              </div>
-              <span className="flex-1 text-left font-medium">Continue Learning</span>
-              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => navigate("/Exercise")}
+            >
+              <Dumbbell className="w-6 h-6 mb-2 text-amber-600" />
+              <span className="text-sm">Exercise</span>
             </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+              onClick={() => navigate("/Appointments")}
+            >
+              <CalendarClock className="w-6 h-6 mb-2 text-teal-600" />
+              <span className="text-sm">Appointments</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-auto py-4 flex-col"
+               onClick={() => navigate("/Community")}
+            >
+              <Users className="w-6 h-6 mb-2 text-violet-600" />
+              <span className="text-sm">Community</span>
+            </Button>
+          </div>
+        </div>
     </motion.div>
   );
 }

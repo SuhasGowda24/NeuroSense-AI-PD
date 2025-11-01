@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
 import Layout from "../src/layouts/Layouts";
@@ -19,6 +19,40 @@ import Community from "./Pages/Dashboard/Patient/Community";
 import AIAssessment from "./Pages/Dashboard/Patient/AIAssessment";
 
 function App() {
+  useEffect(() => {
+    // Check if the script is already loaded to avoid duplicates
+    if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+      window.chatbase = (...args) => {
+        if (!window.chatbase.q) {
+          window.chatbase.q = [];
+        }
+        window.chatbase.q.push(args);
+      };
+      window.chatbase = new Proxy(window.chatbase, {
+        get(target, prop) {
+          if (prop === "q") {
+            return target.q;
+          }
+          return (...args) => target(prop, ...args);
+        }
+      });
+
+      const onLoad = function() {
+        const script = document.createElement("script");
+        script.src = "https://www.chatbase.co/embed.min.js";
+        script.id = "fRW7lC9kjy6f6BXOoHJzV";
+        script.domain = "www.chatbase.co";
+        document.body.appendChild(script);
+      };
+
+      if (document.readyState === "complete") {
+        onLoad();
+      } else {
+        window.addEventListener("load", onLoad);
+      }
+    }
+  }, []);
+
   return (
      <Router>
        <ScrollToTop />
@@ -44,7 +78,7 @@ function App() {
           </Route>
         </Route>
           
-          {/* Patient Routes */}
+          {/* Admin Routes */}
            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         {/* <Route  element={<AdminLayout />}></Route> */}
             <Route path="/admindashboard" element={<AdminDashboard />} />

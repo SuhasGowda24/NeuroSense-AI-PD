@@ -67,7 +67,7 @@
   position: absolute;
   left: 40px;
   top: 0;
-  background: linear-gradient(135deg, #0048ffac, #0a1bd6, #0080ffff);
+  background: linear-gradient(135deg,  #0048ffac, #0a1bd6, #0080ffff);
   border: 3px solid white;
   border-radius: 40px 40px 0 0;
   transform: rotate(-45deg);

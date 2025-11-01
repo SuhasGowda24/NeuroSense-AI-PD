@@ -5,7 +5,6 @@ import NavbarHome from "../components/NavbarHome";
 // import NavbarAdmin from "../components/NavbarAdmin";
 import Footer from "../components/Footer";
 
-
 export default function Layout() {
 
   return (
