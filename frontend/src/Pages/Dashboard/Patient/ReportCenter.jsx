@@ -88,23 +88,13 @@ export default function ReportCenter() {
     queryFn: () => fetchData("medications"),
   });
 
-  const { data: medicationLogs = [] } = useQuery({
-    queryKey: ["medicationLogs"],
-    queryFn: () => fetchData("medication-logs"),
-  });
-
-  // const { data: journalEntries = [] } = useQuery({
-  //   queryKey: ["journalEntries"],
-  //   queryFn: () => fetchData("journal-entries"),
-  // });
-
   const { data: journeys = [] } = useQuery({
   queryKey: ["journeys"],
-  queryFn: () => fetchData("journeys"),
+  queryFn: () => fetchData("journey"),
 });
 
 
-  // ====== 📄 Report Generator ======
+  // Report Generator 
   const generateHTMLReport = (reportType, content) => {
     return `
 <!DOCTYPE html>
@@ -329,7 +319,7 @@ export default function ReportCenter() {
 </html>`;
   };
 
-  // ====== 📥 Download Helper ======
+  // Download Helper
   const downloadHTML = (htmlContent, filename) => {
     const blob = new Blob([htmlContent], { type: "text/html" });
     const url = window.URL.createObjectURL(blob);
@@ -340,7 +330,7 @@ export default function ReportCenter() {
     window.URL.revokeObjectURL(url);
   };
 
-  // ====== 📊 Generate AI Report Example ======
+  // Generate AI Report Example 
   const generateAIAssessmentReport = async () => {
     setIsGenerating(true);
     setGeneratingType("ai_assessment");
@@ -373,9 +363,9 @@ export default function ReportCenter() {
   try {
     const latestScan = aiScans[0];
     const recentSymptoms = symptomLogs.slice(0, 7); // Changed to last 7 days
-    const adherenceRate = medicationLogs.length > 0
-      ? Math.round((medicationLogs.filter(log => log.taken).length / medicationLogs.length) * 100)
-      : 0;
+    // const adherenceRate = medicationLogs.length > 0
+    //   ? Math.round((medicationLogs.filter(log => log.taken).length / medicationLogs.length) * 100)
+    //   : 0;
     const reportId = `RPT-${Date.now()}`; // Generate unique report ID
     const reportDate = format(new Date(), 'MMMM d, yyyy'); // Report date
 
@@ -428,19 +418,14 @@ export default function ReportCenter() {
 
   <div class="section">
     <h2>3. Current Medications</h2>
-    <p><strong>Adherence Rate:</strong> 
-      <span class="risk-badge risk-${
-        adherenceRate >= 80 ? 'low' : adherenceRate >= 60 ? 'moderate' : 'high'
-      }">${adherenceRate}%</span>
-    </p>
-    <p><strong>Active Medications:</strong> ${medications.filter(m => m.active).length}</p>
+    <p><strong>Active Medications:</strong> ${medications.filter(m => m.is_active).length}</p>
     <table>
       <tr>
         <th>Medication</th>
         <th>Dosage</th>
         <th>Frequency</th>
       </tr>
-      ${medications.filter(m => m.active).map(med => `
+      ${medications.filter(m => m.is_active).map(med => `
       <tr>
         <td>${med.name}</td>
         <td>${med.dosage}</td>
@@ -449,15 +434,27 @@ export default function ReportCenter() {
     </table>
   </div>
 
-  <div class="section">
-    <h2>4. All Journeys</h2>
-    <p><strong>Total Journeys:</strong> ${journeys.length}</p>
-    ${journeys.map(journey => `
-    <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4f46e5;">
-      <strong>${format(parseISO(journey.date), 'MMM d, yyyy')} - ${journey.title || 'Journey Entry'}</strong>
-      <p style="margin-top: 5px;">${journey.description || journey.entry || 'No details available.'}</p>
-    </div>`).join('')}
-  </div>
+<div class="section">
+  <h2>4. Journey Timeline</h2>
+  <p><strong>Total Journey Events:</strong> ${journeys.length}</p>
+  ${journeys.length > 0 ? journeys.map(journey => `
+  <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4f46e5;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+      <strong style="color: #4f46e5;">${journey.title}</strong>
+      <span style="background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+        ${journey.eventType || 'Event'}
+      </span>
+    </div>
+    <div style="color: #6b7280; font-size: 14px; margin-bottom: 8px;">
+      <strong>Date:</strong> ${format(parseISO(journey.date), 'MMM d, yyyy')} | 
+      <strong>Significance:</strong> ${journey.significantLevel || 'N/A'}
+    </div>
+    <p style="margin: 0; color: #374151; line-height: 1.5;">
+      ${journey.description || 'No description provided.'}
+    </p>
+  </div>`).join('') : '<p>No journey events recorded yet.</p>'}
+</div>
+
 
   <div class="section">
     <h2>Clinical Recommendations</h2>
@@ -482,134 +479,7 @@ export default function ReportCenter() {
   }
 };
 
-// const generateComprehensiveReport = async () => {
-//   setIsGenerating(true);
-//   setGeneratingType('comprehensive');
-
-//   try {
-//     const latestScan = aiScans[0];
-//     const recentSymptoms = symptomLogs.slice(0, 30);
-//     const adherenceRate = medicationLogs.length > 0
-//       ? Math.round((medicationLogs.filter(log => log.taken).length / medicationLogs.length) * 100)
-//       : 0;
-
-//     const content = `
-//   <div class="section">
-//     <h2>Comprehensive Health Summary</h2>
-//     <p>This comprehensive report includes all health data from the PD Companion platform for ${user.full_name}.</p>
-//   </div>
-
-//   <div class="section">
-//     <h2>1. AI Assessment Status</h2>
-//     ${
-//       latestScan
-//         ? `
-//       <p><strong>Latest Scan:</strong> ${format(parseISO(latestScan.scan_date), 'MMMM d, yyyy')}</p>
-//       <p><strong>Risk Level:</strong> <span class="risk-badge risk-${latestScan.risk_level}">${latestScan.risk_level.toUpperCase()}</span></p>
-//       <p><strong>Confidence:</strong> ${latestScan.confidence_score}%</p>
-//       <p><strong>Total Scans:</strong> ${aiScans.length}</p>
-//     `
-//         : '<p>No AI assessment data available.</p>'
-//     }
-//   </div>
-
-//   <div class="section">
-//     <h2>2. Symptom Tracking (Last 30 Days)</h2>
-//     <table>
-//       <tr>
-//         <th>Date</th>
-//         <th>Tremor</th>
-//         <th>Stiffness</th>
-//         <th>Mood</th>
-//         <th>Sleep</th>
-//       </tr>
-//       ${recentSymptoms
-//         .map(
-//           log => `
-//       <tr>
-//         <td>${format(parseISO(log.date), 'MMM d, yyyy')}</td>
-//         <td>${log.tremor_severity || 'N/A'}</td>
-//         <td>${log.stiffness_level || 'N/A'}</td>
-//         <td>${log.mood_rating || 'N/A'}</td>
-//         <td>${log.sleep_quality || 'N/A'}</td>
-//       </tr>`
-//         )
-//         .join('')}
-//     </table>
-//   </div>
-
-//   <div class="section">
-//     <h2>3. Medication Management</h2>
-//     <p><strong>Adherence Rate:</strong> 
-//       <span class="risk-badge risk-${
-//         adherenceRate >= 80 ? 'low' : adherenceRate >= 60 ? 'moderate' : 'high'
-//       }">${adherenceRate}%</span>
-//     </p>
-//     <p><strong>Active Medications:</strong> ${medications.filter(m => m.active).length}</p>
-//     <table>
-//       <tr>
-//         <th>Medication</th>
-//         <th>Dosage</th>
-//         <th>Frequency</th>
-//       </tr>
-//       ${medications
-//         .filter(m => m.active)
-//         .map(
-//           med => `
-//       <tr>
-//         <td>${med.name}</td>
-//         <td>${med.dosage}</td>
-//         <td>${med.frequency}</td>
-//       </tr>`
-//         )
-//         .join('')}
-//     </table>
-//   </div>
-
-//   <div class="section">
-//     <h2>4. Journal Insights</h2>
-//     <p><strong>Total Entries:</strong> ${journalEntries.length}</p>
-//     ${journalEntries
-//       .slice(0, 5)
-//       .map(
-//         entry => `
-//     <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #4f46e5;">
-//       <strong>${format(parseISO(entry.date), 'MMM d, yyyy')} - Mood: ${
-//           entry.mood
-//         }</strong>
-//       <p style="margin-top: 5px;">${entry.entry.substring(0, 200)}${
-//           entry.entry.length > 200 ? '...' : ''
-//         }</p>
-//     </div>`
-//       )
-//       .join('')}
-//   </div>
-
-//   <div class="section">
-//     <h2>Clinical Recommendations</h2>
-//     <ul style="line-height: 2;">
-//       <li>Continue regular symptom tracking and medication adherence</li>
-//       <li>Schedule follow-up appointments as recommended by your healthcare provider</li>
-//       <li>Maintain regular exercise routine to manage symptoms</li>
-//       <li>Consider joining support groups for additional emotional support</li>
-//       <li>Keep this report updated and share with your medical team</li>
-//     </ul>
-//   </div>
-// `;
-
-//     const html = generateHTMLReport('Comprehensive Health Report', content);
-//     downloadHTML(html, `Comprehensive-Health-Report-${format(new Date(), 'yyyy-MM-dd')}.html`);
-//   } catch (error) {
-//     console.error('Error:', error);
-//     alert('Error generating report. Please try again.');
-//   } finally {
-//     setIsGenerating(false);
-//     setGeneratingType('');
-//   }
-// };
-
-
-  // ====== Choose correct generator ======
+  // Choose correct generator 
 const getReportFunction = (id) => {
   switch (id) {
     case "ai_assessment":
@@ -620,7 +490,6 @@ const getReportFunction = (id) => {
       return null;
   }
 };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-4 md:p-8">
