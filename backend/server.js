@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./db.js";
+import drawingRoutes from "./routes/drawings.js"
 import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
@@ -27,6 +28,7 @@ app.use("/api/profile", profileRoutes); // Fetches Profile data for Welcome Card
 app.use("/api/medications", medicationRoutes); // Medication data  
 app.use("/api/symptom-logs", symptomRoutes); // symptomLogs data
 app.use("/api/journey", journeyRoutes); // journey data
+app.use("/api/drawings",drawingRoutes); // cloudinarystorage data
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

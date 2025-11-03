@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Activity, Pill, Calendar, Heart, Brain } from 'lucide-react';
+import { LayoutDashboard, Activity, Pill, Calendar, Heart, Brain, BookHeart } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import SignInButton from "./ui/signInButton";
@@ -17,6 +17,7 @@ export default function NavbarPatient() {
     { title: "My Journey", icon: Calendar, path: "/journey" },
     { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
     { title: "AI Assessment", icon: Brain, path: "/aiassessment" },
+    { title: "Report Center", icon: BookHeart, path: "/reportcenter" },
   ];
 
   // update login state when location changes (simple heuristic)

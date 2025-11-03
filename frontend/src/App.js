@@ -17,6 +17,7 @@ import Caregiver from "./Pages/Dashboard/Patient/Caregiver";
 import Exercise from "./Pages/Dashboard/Patient/Exercise";
 import Community from "./Pages/Dashboard/Patient/Community";
 import AIAssessment from "./Pages/Dashboard/Patient/AIAssessment";
+import ReportCenter from "./Pages/Dashboard/Patient/ReportCenter";
 
 function App() {
   useEffect(() => {
@@ -75,6 +76,7 @@ function App() {
              <Route path="/exercise" element={<Exercise />} />
              <Route path="/community" element={<Community />} />
              <Route path="/aiassessment" element={<AIAssessment />} />
+             <Route path="/reportcenter" element={<ReportCenter />} />
           </Route>
         </Route>
           

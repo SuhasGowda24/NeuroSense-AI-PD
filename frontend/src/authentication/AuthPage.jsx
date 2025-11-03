@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Lock, Mail, Brain, Plus, ArrowLeft } from "lucide-react";
+import { User, Lock, Mail, ArrowLeft } from "lucide-react";
 import { Button } from "../components/ui/button";
 import "../styles/style.css";
 
@@ -143,8 +143,12 @@ export default function AuthPage() {
         <div
           className={`panel ${showLogin ? "panel-login" : "panel-signup"}`}
         >
-          <div className="panel-icon">
-            <div className="icon-inner">{showLogin ? "🧠" : "🤖"}</div>
+         <div className="form-icon w-28 h-28 rounded-full overflow-hidden shadow-md">
+            <img 
+              src="/assets/L2.png" 
+              alt="Brain Logo" 
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {showLogin ? (
@@ -179,7 +183,13 @@ export default function AuthPage() {
       <div className="auth-mobile mobile-full">
         <div className="mobile-header">
           <div className="mobile-icon">
-            <div className="icon-inner">{showLogin ? "🧠" : "🤖"}</div>
+            <div className="form-icon w-20 h-19 rounded-full overflow-hidden shadow-md mt-5">
+            <img 
+              src="/assets/L2.png" 
+              alt="Brain Logo" 
+              className="w-full h-full object-cover"
+            />
+          </div>
           </div>
           <h2>{showLogin ? "Welcome Back" : "Create Account"}</h2>
           <p>{showLogin ? "Sign in to your dashboard" : "Join our AI platform"}</p>
@@ -224,9 +234,15 @@ function Login({ formData, handleInputChange, handleLogin, setFormData, setShowL
     <div className="form-container">
       {!isMobile && (
         <>
-          <div className="form-icon">
-            <Brain size={36} color="white" strokeWidth={2.5} />
-          </div>
+        <div className="form-icon w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-lg border border-gray-100 overflow-hidden">
+  <img
+    src="/assets/Logo.png"
+    alt="Brain Logo"
+    className="w-20 h-20 object-contain transition-transform duration-300 hover:scale-105"
+  />
+</div>
+
+
           <h1>Welcome Back</h1>
           <p>Sign in to access your dashboard</p>
         </>
@@ -281,9 +297,14 @@ function Signup({ formData, handleInputChange, handleSignup, setFormData, setSho
     <div className="form-container">
       {!isMobile && (
         <>
-          <div className="form-icon">
-            <Plus size={36} color="white" strokeWidth={2.5} />
-          </div>
+           <div className="form-icon w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg border border-gray-100 overflow-hidden">
+              <img
+                src="/assets/Logo.png"
+                alt="Brain Logo"
+                className="w-16 h-18 object-contain transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+
           <h1>Create Account</h1>
           <p>Join our AI-powered platform</p>
         </>

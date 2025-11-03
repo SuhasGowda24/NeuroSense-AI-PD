@@ -333,29 +333,39 @@ export default function Home() {
       <section className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto text-center">
             <h2 className="text-center text-3xl lg:text-4xl font-bold text-gray-900 mb-6">Your Path to Empowerment</h2>
-            <p className="text-center text-xl text-gray-700 mb-8 leading-relaxed">A simple, clear journey to taking control.</p>
+            <p className="text-center text-xl text-gray-700 mb-8 leading-relaxed"> A clear, guided journey to take control of your neurological health.</p>
             <div className="grid md:grid-cols-3 gap-10">
                 <div className="flex flex-col items-center">
                     <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-lg">
                         <UserPlus className="w-10 h-10 text-blue-600" />
                     </div>
                     <h3 className="text-xl font-semibold mb-2">1. Sign Up & Personalize</h3>
-                    <p className="text-gray-800">Create your secure account and tell us a bit about your journey.</p>
+                    <p className="text-gray-800"> Create your secure profile and customize your experience for better insights.</p>
                 </div>
                 <div className="flex flex-col items-center">
                     <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-lg">
                         <ClipboardList className="w-10 h-10 text-blue-600" />
                     </div>
                     <h3 className="text-xl font-semibold mb-2">2. Learn & Track</h3>
-                    <p className="text-gray-800">Explore learning modules and use our tools to track symptoms and medications.</p>
+                    <p className="text-gray-800">Access learning resources and monitor your progress, symptoms, and medications with ease.</p>
                 </div>
                 <div className="flex flex-col items-center">
                     <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-lg">
                         <Users className="w-10 h-10 text-blue-600" />
                     </div>
                     <h3 className="text-xl font-semibold mb-2">3. Connect & Grow</h3>
-                    <p className="text-gray-800">Join community discussions and gain insights from shared experiences.</p>
+                    <p className="text-gray-800">Engage with our supportive community, share experiences, and learn from others on a similar journey.</p>
                 </div>
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-lg">
+                  <Brain className="w-10 h-10 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">4. Take AI Assessment</h3>
+                <p className="text-gray-800">
+                   Experience real-time AI evaluation through handwriting or image tests. 
+          Get instant, detailed reports—ready to view, download, and track over time.
+                </p>
+              </div>
             </div>
         </div>
       </section>
