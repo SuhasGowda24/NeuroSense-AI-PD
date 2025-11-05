@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
 import Layout from "../src/layouts/Layouts";
 import PatientLayout from "../src/layouts/PatientLayout";
+import AdminLayout from "../src/layouts/AdminLayout";
 import Home from "./Pages/Home";
 import Assignment from "./Pages/Assignment";
 import AuthPage from "./authentication/AuthPage";
@@ -81,9 +82,10 @@ function App() {
         </Route>
           
           {/* Admin Routes */}
-           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-        {/* <Route  element={<AdminLayout />}></Route> */}
-            <Route path="/admindashboard" element={<AdminDashboard />} />
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route  element={<AdminLayout />}>
+          <Route path="/admindashboard" element={<AdminDashboard />} />
+          </Route>
           </Route>
 
         {/* Auth route (no navbar/footer) */}

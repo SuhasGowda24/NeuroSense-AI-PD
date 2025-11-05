@@ -1,62 +1,139 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  FileText, 
-  Pill, 
-  BarChart3, 
-  Settings, 
-  User 
-} from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { LayoutDashboard, Activity, Pill, Calendar, Heart, Brain, BookHeart, Shield, Bell } from 'lucide-react';
+import { Link, useLocation } from "react-router-dom";
+import { Button } from "./ui/button";
+import SignInButton from "./ui/signInButton";
+import SignOutButton from "./ui/signOutButton";
 
 export default function NavbarAdmin() {
+  const location = useLocation();
+  const [activeItem, setActiveItem] = useState("Dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  const navigationLinks = [
+    // { title: "Dashboard", icon: LayoutDashboard, path: "/Admindashboard" },
+    // { title: "Medications", icon: Pill, path: "/medication" },
+    // { title: "My Journey", icon: Calendar, path: "/journey" },
+    // { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
+    // { title: "AI Assessment", icon: Brain, path: "/aiassessment" },
+    // { title: "Report Center", icon: BookHeart, path: "/reportcenter" },
+  ];
+
+  // update login state when location changes (simple heuristic)
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem("token"));
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const current = navigationLinks.find(
+      (link) => link.path.toLowerCase() === location.pathname.toLowerCase()
+    );
+    if (current) {
+      setActiveItem(current.title);
+    } else {
+      setActiveItem("Dashboard"); // fallback default
+    }
+  }, [location.pathname]);
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
   return (
-    <nav className="bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          
-          {/* Logo / Brand */}
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
-              <User className="text-blue-600 w-6 h-6" />
+    <>
+      <nav className="bg-white/95 backdrop-blur-sm border-b border-teal-100 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Navbar Top Row */}
+          <div className="flex justify-between items-center h-16">
+            <Link to="/admindashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              {/* Logo */}
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-900 text-lg">Administration Dashboard</h2>
+                <p className="text-xs text-red-500 font-medium -mt-1">Management and Analytics Portal</p>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1">
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.title}
+                  to={link.path}
+                  onClick={() => setActiveItem(link.title)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                    activeItem === link.title
+                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md shadow-teal-500/20'
+                      : 'text-gray-700 hover:text-teal-600 hover:bg-teal-50'
+                  }`}
+                >
+                  <link.icon className="w-4 h-4" />
+                  <span className="text-sm">{link.title}</span>
+                </Link>
+              ))}
+              <button className="p-2 mr-6 hover:bg-gray-100 rounded relative">
+                <Bell className="w-5 h-5 text-gray-600" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+              {/* User: show Logout when logged in, otherwise Sign In */}
+              {isLoggedIn ? <SignOutButton /> : <SignInButton />}
             </div>
-            <h1 className="text-xl font-bold text-white">Patient Portal</h1>
+
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden">
+              <Button
+                className="flex flex-col gap-1.5 p-2 bg-teal-500 hover:bg-teal-400 rounded-lg transition-colors"
+                onClick={toggleMobileMenu}
+              >
+                <span
+                  className={`block w-6 h-0.5 bg-white transition-transform duration-300 ${
+                    isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+                  }`}
+                ></span>
+                <span
+                  className={`block w-6 h-0.5 bg-white transition-opacity duration-300 ${
+                    isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
+                  }`}
+                ></span>
+                <span
+                  className={`block w-6 h-0.5 bg-white transition-transform duration-300 ${
+                    isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+                  }`}
+                ></span>
+              </Button>
+            </div>
           </div>
 
-          {/* Nav Links */}
-          <div className="hidden md:flex space-x-6">
-            <Link to="/dashboard" className="flex items-center gap-2 text-white hover:text-yellow-300 transition">
-              <LayoutDashboard size={18} /> Dashboard
-            </Link>
-            <Link to="/appointments" className="flex items-center gap-2 text-white hover:text-yellow-300 transition">
-              <Calendar size={18} /> Appointments
-            </Link>
-            <Link to="/records" className="flex items-center gap-2 text-white hover:text-yellow-300 transition">
-              <FileText size={18} /> Records
-            </Link>
-            <Link to="/medicines" className="flex items-center gap-2 text-white hover:text-yellow-300 transition">
-              <Pill size={18} /> Medicines
-            </Link>
-            <Link to="/reports" className="flex items-center gap-2 text-white hover:text-yellow-300 transition">
-              <BarChart3 size={18} /> Reports
-            </Link>
-            <Link to="/settings" className="flex items-center gap-2 text-white hover:text-yellow-300 transition">
-              <Settings size={18} /> Settings
-            </Link>
-          </div>
-
-          {/* Profile */}
-          <div className="flex items-center gap-3">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="profile"
-              className="w-10 h-10 rounded-full border-2 border-white"
-            />
-            <span className="hidden md:inline text-white font-medium">John Doe</span>
-          </div>
+          {/* Mobile Dropdown Menu */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden bg-white shadow-md border-t border-teal-100">
+              <div className="flex flex-col px-4 py-2 space-y-2">
+                {navigationLinks.map((link) => (
+                  <Link
+                    key={link.title}
+                    to={link.path}
+                    onClick={() => {
+                      setActiveItem(link.title);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                      activeItem === link.title
+                        ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
+                        : 'text-gray-700 hover:text-teal-600 hover:bg-teal-50'
+                    }`}
+                  >
+                    <link.icon className="w-4 h-4" />
+                    <span className="font-medium">{link.title}</span>
+                  </Link>
+                ))}
+                {/* Sign In / Logout for Mobile */}
+                {isLoggedIn ? <SignOutButton /> : <SignInButton />}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

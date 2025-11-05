@@ -30,5 +30,10 @@ app.use("/api/symptom-logs", symptomRoutes); // symptomLogs data
 app.use("/api/journey", journeyRoutes); // journey data
 app.use("/api/drawings",drawingRoutes); // cloudinarystorage data
 
+// Default route for sanity check
+app.get("/", (req, res) => {
+  res.send("Backend server is running successfully!");
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

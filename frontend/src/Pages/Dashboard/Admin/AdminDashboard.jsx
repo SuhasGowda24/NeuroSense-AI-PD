@@ -7,21 +7,20 @@ import {
   Database,
   BarChart3,
   Activity,
-  Settings,
   AlertCircle,
   TrendingUp,
   FileText,
-  Lock
+  Lock,
+  Calendar
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { color, motion } from "framer-motion";
 
 import UserManagement from "../../../components/AdminDashboard/UserManagement";
 import DatasetManagement from "../../../components/AdminDashboard/DatasetManagement";
 import AnalyticsDashboard from "../../../components/AdminDashboard/AnalyticsDashboard";
-import ModelPerformance from "../../../components/AdminDashboard/ModelPerformance";
+// import ModelPerformance from "../../../components/AdminDashboard/ModelPerformance";
 import SystemLogs from "../../../components/AdminDashboard/SystemLogs";
 import FeedbackManagement from "../../../components/AdminDashboard/FeedbackManagement";
-import SystemSettings from "../../../components/AdminDashboard/SystemSettings";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -49,67 +48,42 @@ export default function Admin() {
     }, 800);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full"
-        />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <Card className="max-w-md">
-          <CardContent className="p-8 text-center">
-            <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-            <p className="text-gray-600">
-              You don't have permission to access this area.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p className="text-lg  text-gray-600">Loading...</p>
+    </div>
+  );
+}
 
   const tabs = [
     { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "users", label: "Users", icon: Users },
     { id: "datasets", label: "Datasets", icon: Database },
     { id: "analytics", label: "Analytics", icon: TrendingUp },
-    { id: "models", label: "Model Performance", icon: Activity },
+    // { id: "models", label: "Model Performance", icon: Activity },
     { id: "logs", label: "System Logs", icon: FileText },
-    { id: "feedback", label: "Feedback", icon: AlertCircle },
-    { id: "settings", label: "Settings", icon: Settings },
+    { id: "feedback", label: "Feedback", icon: AlertCircle }
   ];
 
   const quickStats = [
     {
       title: "Total Users",
-      value: stats.totalUsers,
       icon: Users,
-      color: "from-blue-500 to-indigo-500",
+      color: "bg-gradient-to-br from-blue-500 to-blue-600",
     },
     {
       title: "Total Tests",
-      value: stats.totalTests,
       icon: Activity,
       color: "from-green-500 to-emerald-500",
     },
-    {
-      title: "Datasets",
-      value: stats.datasets,
-      icon: Database,
-      color: "from-purple-500 to-pink-500",
+     {
+      title: "Schedule Appointment",
+      icon: Calendar,
+      color: "from-purple-500 to-purple-600",
     },
     {
       title: "Active Sessions",
-      value: stats.activeSessions,
       icon: TrendingUp,
       color: "from-orange-500 to-red-500",
     },
@@ -122,20 +96,6 @@ export default function Admin() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-[1600px] mx-auto"
       >
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center shadow-xl">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">
-                Administration Dashboard
-              </h1>
-              <p className="text-gray-600">System management and analytics</p>
-            </div>
-          </div>
-        </div>
 
         {/* Quick Stats */}
         {activeTab === "overview" && (
@@ -238,10 +198,9 @@ export default function Admin() {
           {activeTab === "users" && <UserManagement />}
           {activeTab === "datasets" && <DatasetManagement />}
           {activeTab === "analytics" && <AnalyticsDashboard />}
-          {activeTab === "models" && <ModelPerformance />}
+          {/* {activeTab === "models" && <ModelPerformance />} */}
           {activeTab === "logs" && <SystemLogs />}
           {activeTab === "feedback" && <FeedbackManagement />}
-          {activeTab === "settings" && <SystemSettings />}
         </motion.div>
       </motion.div>
     </div>

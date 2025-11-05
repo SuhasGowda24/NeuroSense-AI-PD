@@ -1,28 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-// import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
+import { Button } from "../ui/button";
+import { Badge } from "lucide-react";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/ui/select";
 import {
   Users,
   Search,
   Mail,
   Calendar,
-  Shield,
-  UserCheck,
-  UserX,
-  Edit,
-  Trash2,
+  Filter,
+  Info,
+  Shield
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import axiosClient from "../../lib/axiosClient";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -30,96 +23,77 @@ export default function UserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [hoveredUserId, setHoveredUserId] = useState(null);
+  const [cardPosition, setCardPosition] = useState('left');
+  const buttonRef = useRef(null);
 
-  useEffect(() => {
-    loadMockUsers();
-  }, []);
+  // Add this function to calculate best position
+const calculatePosition = (buttonElement) => {
+  if (!buttonElement) return 'left';
+  
+  const rect = buttonElement.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const cardWidth = 320; // 80 * 4 (w-80 = 320px)
+  
+  const spaceOnRight = viewportWidth - rect.right;
+  const spaceOnLeft = rect.left;
+  
+  // If more space on left, show on left, otherwise on right
+  if (spaceOnLeft > cardWidth) {
+    return 'left';
+  } else if (spaceOnRight > cardWidth) {
+    return 'right';
+  } else {
+    return 'center'; // fallback for mobile
+  }
+};
 
-  useEffect(() => {
-    filterUsers();
-  }, [users, searchTerm, roleFilter]);
 
-  // 🧩 Simulate loading mock data
-  const loadMockUsers = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const mockData = [
-        {
-          id: "U001",
-          full_name: "Dr. Arjun Rao",
-          email: "arjun.rao@example.com",
-          role: "doctor",
-          created_date: "2024-06-12",
-        },
-        {
-          id: "U002",
-          full_name: "Neha Sharma",
-          email: "neha.sharma@example.com",
-          role: "user",
-          created_date: "2024-07-05",
-        },
-        {
-          id: "U003",
-          full_name: "Rahul Patel",
-          email: "rahul.patel@example.com",
-          role: "researcher",
-          created_date: "2024-08-22",
-        },
-        {
-          id: "U004",
-          full_name: "Admin Priya",
-          email: "admin.priya@example.com",
-          role: "admin",
-          created_date: "2024-03-18",
-        },
-        {
-          id: "U005",
-          full_name: "Dr. Kavya Nair",
-          email: "kavya.nair@example.com",
-          role: "doctor",
-          created_date: "2024-09-10",
-        },
-      ];
-      setUsers(mockData);
+  useEffect(() => { fetchUsers(); }, []);
+  // Fetch users from backend
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosClient.get("/dashboard/users"); 
+      setUsers(response.data.users || []);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
+  // Filter by role or search
   const filterUsers = () => {
     let filtered = [...users];
 
     if (roleFilter !== "all") {
-      filtered = filtered.filter((u) => u.role === roleFilter);
+      filtered = filtered.filter((user) => user.role?.toLowerCase() === roleFilter);
     }
-
     if (searchTerm) {
       filtered = filtered.filter(
         (u) =>
           u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          u.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+          u.username?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-
     setFilteredUsers(filtered);
   };
 
-  const updateUserRole = (userId, newRole) => {
-    const updatedUsers = users.map((user) =>
-      user.id === userId ? { ...user, role: newRole } : user
-    );
-    setUsers(updatedUsers);
-  };
+ useEffect(() => {
+    filterUsers();
+  }, [users, searchTerm, roleFilter]);
 
+  // Role Badge styling
   const getRoleBadge = (role) => {
     const badges = {
       admin: "bg-red-100 text-red-700 border-red-200",
-      doctor: "bg-blue-100 text-blue-700 border-blue-200",
-      researcher: "bg-purple-100 text-purple-700 border-purple-200",
       user: "bg-gray-100 text-gray-700 border-gray-200",
     };
     return badges[role] || badges.user;
   };
 
+  // Loader
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -130,36 +104,48 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Search and Filter */}
-      <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">
-        <CardContent className="p-6">
-          <div className="grid md:grid-cols-4 gap-4">
-            <div className="md:col-span-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  placeholder="Search by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-12"
-                />
-              </div>
-            </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Filter by role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="doctor">Doctor</SelectItem>
-                <SelectItem value="researcher">Researcher</SelectItem>
-                <SelectItem value="user">Patient</SelectItem>
-              </SelectContent>
-            </Select>
+      {/* Search and Filter Section */}
+  <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg relative z-20">
+  <CardContent className="p-6">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Role Filter */}
+        <div className="w-full sm:w-64 relative z-30">
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="h-12 w-full border-gray-200 hover:border-gray-300 transition-colors">
+      <div className="flex items-center gap-2">
+        <Filter className="w-4 h-4" />
+        <SelectValue placeholder="Filter by role">
+          {roleFilter === 'all' && 'All Roles'}
+          {roleFilter === 'admin' && 'Admin'}
+          {roleFilter === 'user' && 'Patient'}
+        </SelectValue>
+      </div>
+    </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="user">Patient</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Search Bar */}
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-12 border-gray-200 hover:border-gray-300 transition-colors"
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+    </div>
+  </CardContent>
+</Card>
 
       {/* Users Table */}
       <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">
@@ -171,28 +157,20 @@ export default function UserManagement() {
             </div>
           </CardTitle>
         </CardHeader>
+
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Joined
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Joined</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Info</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-200">
                 {filteredUsers.map((user, index) => (
                   <motion.tr
@@ -202,76 +180,154 @@ export default function UserManagement() {
                     transition={{ delay: index * 0.05 }}
                     className="hover:bg-red-50/50 transition-colors"
                   >
+                    {/* Name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                          {user.full_name?.charAt(0)?.toUpperCase() ||
-                            user.email?.charAt(0)?.toUpperCase()}
+                          {user.username?.charAt(0)?.toUpperCase() || "?"}
                         </div>
                         <div>
-                          <div className="font-semibold text-gray-900">
-                            {user.full_name || "N/A"}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            ID: {user.id}
-                          </div>
+                          <div className="font-semibold text-gray-900">{user.username || 'Patient'}</div>
                         </div>
                       </div>
                     </td>
+
+                    {/* Email */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Mail className="w-4 h-4" />
-                        {user.email}
+                        {user.email || 'N/A'}
                       </div>
                     </td>
+
+                    {/* Role */}
                     <td className="px-6 py-4">
-                      <Select
-                        value={user.role}
-                        onValueChange={(newRole) =>
-                          updateUserRole(user.id, newRole)
-                        }
-                      >
-                        <SelectTrigger
-                          className={`w-32 h-9 ${getRoleBadge(user.role)}`}
-                        >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="user">Patient</SelectItem>
-                          <SelectItem value="doctor">Doctor</SelectItem>
-                          <SelectItem value="researcher">
-                            Researcher
-                          </SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
+                       <span className={`px-3 py-1 rounded-full text-sm border ${getRoleBadge(user.role)}`}>
+                          {user.role || "N/A"}
+                        </span>
                     </td>
+
+                    {/* Date */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="w-4 h-4" />
-                        {user.created_date
-                          ? format(new Date(user.created_date), "MMM d, yyyy")
-                          : "N/A"}
+                       {user.createdAt || user.created_date
+                        ? format(new Date(user.createdAt || user.created_date), "MMM d, yyyy")
+                        : "N/A"}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:bg-blue-50 hover:text-blue-600"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+
+                    {/* Info */}
+                 <td className="px-6 py-4">
+                  <div className="relative inline-block">
+                    <div
+                      ref={buttonRef}
+                      onMouseEnter={() => {
+                        setHoveredUserId(user.id);
+                        const position = calculatePosition(buttonRef.current);
+                        setCardPosition(position);
+                      }}
+                    >
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="hover:bg-blue-50 hover:text-blue-600"
+                      >
+                        <Info className="w-4 h-4 text-blue-700" />
+                      </Button>
+                    </div>
+                    
+                    {hoveredUserId === user.id && (
+                      <div 
+                        className={`
+                          z-[100] w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-gray-200 bg-white p-4 shadow-2xl
+                          ${cardPosition === 'left' ? 'absolute right-full mr-2 top-1/2 -translate-y-1/2' : ''}
+                          ${cardPosition === 'right' ? 'absolute left-full ml-2 top-1/2 -translate-y-1/2' : ''}
+                          ${cardPosition === 'center' ? 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : ''}
+                        `}
+                        onMouseEnter={() => setHoveredUserId(user.id)}
+                        onMouseLeave={() => setHoveredUserId(null)}
+                      >
+                        <div className="space-y-3">
+                          {/* Header */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm md:text-lg flex-shrink-0">
+                                {user.username?.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">{user.username}</h4>
+                                <p className="text-xs md:text-sm text-gray-500 capitalize">{user.role}</p>
+                              </div>
+                            </div>
+                            <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="flex-shrink-0 text-xs">
+                              {user.role}
+                            </Badge>
+                          </div>
+
+                          {/* Divider */}
+                          <div className="border-t border-gray-200"></div>
+
+                          {/* Details */}
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-xs md:text-sm">
+                              <Mail className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+                              <span className="text-gray-600 truncate">{user.email}</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 text-xs md:text-sm">
+                              <Calendar className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+                              <span className="text-gray-600">
+                                Diagnosis Date {user.diagnosis_date ? format(new Date(user.diagnosis_date), "MMM d, yyyy") : "N/A"}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-xs md:text-sm">
+                              <Shield className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+                              <span className="text-gray-600">
+                                Status: <span className="text-green-600 font-medium">Active</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Quick Stats for Patients */}
+                          {user.role === 'user' && (
+                            <>
+                              <div className="border-t border-gray-200"></div>
+                              <div className="grid grid-cols-2 gap-2 md:gap-3">
+                                <div className="bg-blue-50 rounded-lg p-2 text-center">
+                                  <p className="text-xs text-gray-500">Appointments</p>
+                                  <p className="text-base md:text-lg font-semibold text-blue-600">
+                                    {user.appointmentCount || 0}
+                                  </p>
+                                </div>
+                                <div className="bg-green-50 rounded-lg p-2 text-center">
+                                  <p className="text-xs text-gray-500">Records</p>
+                                  <p className="text-base md:text-lg font-semibold text-green-600">
+                                    {user.recordCount || 0}
+                                  </p>
+                                </div>
+                              </div>
+                            </>
+                          )}
+
+                          {/* Footer Action */}
+                          <Button 
+                            className="w-full mt-2 text-xs md:text-sm" 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              console.log('View full profile:', user);
+                              setHoveredUserId(null);
+                            }}
+                          >
+                            View Full Profile
+                          </Button>
+                        </div>
                       </div>
-                    </td>
+                    )}
+                  </div>
+                </td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -286,51 +342,6 @@ export default function UserManagement() {
           )}
         </CardContent>
       </Card>
-
-      {/* Stats Cards */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="border-none shadow-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold mb-1">
-                  {users.filter((u) => u.role === "user").length}
-                </div>
-                <div className="text-blue-100">Total Patients</div>
-              </div>
-              <UserCheck className="w-12 h-12 opacity-50" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-lg bg-gradient-to-br from-purple-500 to-pink-500 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold mb-1">
-                  {users.filter((u) => u.role === "doctor").length}
-                </div>
-                <div className="text-purple-100">Doctors</div>
-              </div>
-              <Shield className="w-12 h-12 opacity-50" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-lg bg-gradient-to-br from-red-500 to-orange-500 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold mb-1">
-                  {users.filter((u) => u.role === "admin").length}
-                </div>
-                <div className="text-red-100">Admins</div>
-              </div>
-              <UserX className="w-12 h-12 opacity-50" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
