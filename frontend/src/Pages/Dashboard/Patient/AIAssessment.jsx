@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+// import axios from "axios";
 import { Card, CardContent } from "../../../components/ui/card";
 // import { Button } from "../../../components/ui/button";
 // import { Badge } from "../../../components/ui/badge";
@@ -10,6 +10,7 @@ import {
   // Download,
   // Loader2,
   Pencil,
+  Image,
 } from "lucide-react";
 // import { format, parseISO } from "date-fns";
 // import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -20,68 +21,49 @@ import { Tabs, TabsContent } from "../../../components/ui/tabs";
 //   DropdownMenuItem,
 //   DropdownMenuTrigger,
 // } from "../../../components/ui/dropdown";
-
 import DrawingPad from "../../../components/PDashboard/DrawingPad";
-
-// const riskLevelConfig = {
-//   low: {
-//     color: "text-green-600",
-//     bg: "bg-green-50",
-//     border: "border-green-200",
-//     icon: CheckCircle,
-//     label: "Low Risk",
-//     description: "Your assessments show healthy markers with low risk indicators.",
-//   },
-//   moderate: {
-//     color: "text-yellow-600",
-//     bg: "bg-yellow-50",
-//     border: "border-yellow-200",
-//     icon: AlertTriangle,
-//     label: "Moderate Risk",
-//     description: "Some biomarkers detected. Continue monitoring and follow medical advice.",
-//   },
-//   high: {
-//     color: "text-red-600",
-//     bg: "bg-red-50",
-//     border: "border-red-200",
-//     icon: AlertTriangle,
-//     label: "High Risk",
-//     description: "Significant biomarkers detected. Please consult with your neurologist.",
-//   },
-// };
-
+import ImageCNN from "../../../components/PDashboard/ImageCNN";
 const assessmentTypes = [
   {
-    id: "drawing",
+  id: "drawing",
+  name: "Spiral Test",
+  icon: Pencil,
+  description: "Spiral Drawing Analysis",
+  color: "text-blue-600",
+  bg: "bg-blue-50",
+},
+
+   {
+    id: "image",
     name: "Motor Skills Test",
-    icon: Pencil,
-    description: "Drawing and handwriting analysis",
+    icon: Image,
+    description: "Image Analysis",
     color: "text-blue-600",
     bg: "bg-blue-50",
   },
 ];
 
 export default function AIAssessment() {
-  const [scans, setScans] = useState([]);
-  const [user, setUser] = useState({});
+  // const [scans, setScans] = useState([]);
+  // const [user, setUser] = useState({});
   // const [isDownloading, setIsDownloading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch user info
-  useEffect(() => {
-    axios
-      .get("/api/me") // ← Replace with your backend user endpoint
-      .then((res) => setUser(res.data))
-      .catch((err) => console.error("Error fetching user:", err));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("/api/me") 
+  //     .then((res) => setUser(res.data))
+  //     .catch((err) => console.error("Error fetching user:", err));
+  // }, []);
 
   // Fetch scan results
-  useEffect(() => {
-    axios
-      .get("/api/ai-scans") // ← Replace with your backend scans endpoint
-      .then((res) => setScans(res.data || []))
-      .catch((err) => console.error("Error fetching scans:", err));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("/api/ai-scans")
+  //     .then((res) => setScans(res.data || []))
+  //     .catch((err) => console.error("Error fetching scans:", err));
+  // }, []);
 
   // const latestScan = scans[0];
   // const chartData = scans
@@ -224,6 +206,11 @@ export default function AIAssessment() {
             <DrawingPad />
           </TabsContent>
         </Tabs>
+         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsContent value="image">
+            <ImageCNN />
+          </TabsContent>
+          </Tabs>
       </div>
     </div>
   );

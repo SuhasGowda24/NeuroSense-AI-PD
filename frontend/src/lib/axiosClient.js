@@ -6,7 +6,7 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token"); // wherever you store JWT
-  if (token) {
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
