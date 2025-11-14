@@ -61,7 +61,7 @@ export default function ReportCenter() {
   const fetchData = async (endpoint) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_BASE_URL}/${endpoint}`, {
-    headers: { "Authorization": `Bearer ${token}` }
+     headers: { "Authorization": `Bearer ${token}` }
   });
   if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
   return res.json();
@@ -71,11 +71,6 @@ export default function ReportCenter() {
   const { data: user = {} } = useQuery({
     queryKey: ["currentUser"],
     queryFn: () => fetchData("profile/me"),
-  });
-
-  const { data: aiScans = [] } = useQuery({
-    queryKey: ["aiScans"],
-    queryFn: () => fetchData("ai-scan-results"),
   });
 
   const { data: symptomLogs = [] } = useQuery({
@@ -93,6 +88,16 @@ export default function ReportCenter() {
   queryFn: () => fetchData("journey"),
 });
 
+ const { data: latestAI } = useQuery({
+  queryKey: ["latestPrediction"],
+  queryFn: async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE_URL}/predictions/latest`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.json();
+  }
+});
 
   // Report Generator 
   const generateHTMLReport = (reportType, content) => {
@@ -319,30 +324,73 @@ export default function ReportCenter() {
 </html>`;
   };
 
-  // Download Helper
-  const downloadHTML = (htmlContent, filename) => {
-    const blob = new Blob([htmlContent], { type: "text/html" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
+  // Download Helper (MUST BE ABOVE report functions!)
+const downloadHTML = (htmlContent, filename) => {
+  const blob = new Blob([htmlContent], { type: "text/html" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
 
-  // Generate AI Report Example 
+  // Download Helper
+//  const downloadPDF = async (htmlContent) => {
+//   try {
+//     const res = await fetch(`${API_BASE_URL}/reports/pdf`, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ html: htmlContent })
+//     });
+
+//     const blob = await res.blob();
+//     const url = window.URL.createObjectURL(blob);
+
+//     const a = document.createElement("a");
+//     a.href = url;
+//     a.download = "Medical_Report.pdf";
+//     a.click();
+//     window.URL.revokeObjectURL(url);
+
+//   } catch (err) {
+//     console.error("PDF download error:", err);
+//   }
+// };
+
+
+  // Generate AI Report 
   const generateAIAssessmentReport = async () => {
     setIsGenerating(true);
     setGeneratingType("ai_assessment");
     try {
-      const latestScan = aiScans[0];
-      const content = latestScan
-        ? `
+    if (!latestAI) {
+      alert("No AI scan data found.");
+      return;
+    }
+
+    // Always get latest scan
+    const latestScan = latestAI; 
+
+      const content = `
         <h2>AI Assessment</h2>
-        <p><strong>Risk:</strong> <span class="risk-${latestScan.risk_level}">${latestScan.risk_level}</span></p>
-        <p><strong>Confidence:</strong> ${latestScan.confidence_score}%</p>
-        `
-        : "<p>No AI scan data found.</p>";
+        
+        <p><strong>Prediction:</strong> ${latestScan.prediction}</p>
+        <p><strong>Timestamp:</strong> 
+        ${latestScan.timestamp ? format(new Date(latestScan.timestamp), "PPP p") : "N/A"}
+        </p>
+
+        ${latestScan.overlay_url ? `
+        <h3 style="margin-top: 20px;">Grad-CAM Overlay</h3>
+        <img src="${latestScan.overlay_url}" 
+             style="border-radius:8px;max-width:360px;box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
+      ` : ""}
+        ${latestScan.heatmap_url ? `
+            <h3 style="margin-top: 20px;">Raw Heatmap</h3>
+            <img src="${latestScan.heatmap_url}" 
+                 style="border-radius:8px;max-width:360px;box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
+          ` : ""}
+        `;
 
       const html = generateHTMLReport("AI Assessment Report", content);
       downloadHTML(html, "AI-Assessment-Report.html");
@@ -361,11 +409,8 @@ export default function ReportCenter() {
   setGeneratingType('comprehensive');
 
   try {
-    const latestScan = aiScans[0];
+    const latestScan = latestAI;
     const recentSymptoms = symptomLogs.slice(0, 7); // Changed to last 7 days
-    // const adherenceRate = medicationLogs.length > 0
-    //   ? Math.round((medicationLogs.filter(log => log.taken).length / medicationLogs.length) * 100)
-    //   : 0;
     const reportId = `RPT-${Date.now()}`; // Generate unique report ID
     const reportDate = format(new Date(), 'MMMM d, yyyy'); // Report date
 
@@ -386,12 +431,20 @@ export default function ReportCenter() {
   <div class="section">
     <h2>1. AI Assessment Status</h2>
     ${latestScan ? `
-      <p><strong>Latest Scan:</strong> ${format(parseISO(latestScan.scan_date), 'MMMM d, yyyy')}</p>
-      <p><strong>Risk Level:</strong> <span class="risk-badge risk-${latestScan.risk_level}">${latestScan.risk_level.toUpperCase()}</span></p>
-      <p><strong>Confidence:</strong> ${latestScan.confidence_score}%</p>
-      <p><strong>Total Scans:</strong> ${aiScans.length}</p>
-    ` : '<p>No AI assessment data available.</p>'}
-  </div>
+      <p><strong>Prediction:</strong> ${latestScan.prediction}</p>
+      <p><strong>Date:</strong> ${
+        latestScan.timestamp ? format(new Date(latestScan.timestamp), 'MMMM d, yyyy') : 'N/A'
+      }</p>
+      ${latestScan.overlay_url ? `
+        <h3>Overlay Image</h3>
+        <img src="${latestScan.overlay_url}" width="300" style="border-radius:8px;margin-bottom:15px;" />
+        ` : ""}
+         ${latestScan.heatmap_url ? `
+          <h3>Heatmap Image</h3>
+          <img src="${latestScan.heatmap_url}" width="300" style="border-radius:8px;margin-bottom:15px;" />
+          ` : ""}
+          ` : "<p>No AI assessment data available.</p>"}
+    </div>
 
   <div class="section">
     <h2>2. Symptom Tracking (Last 7 Days)</h2>

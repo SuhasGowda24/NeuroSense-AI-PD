@@ -145,7 +145,7 @@ export default function AIAssessment() {
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
               <Brain className="w-8 h-8 text-indigo-600" />
-              AI Health Assessment Center
+              AI Assessment Center
             </h1>
             <p className="text-gray-600">
               Comprehensive multi-modal Parkinson's disease screening

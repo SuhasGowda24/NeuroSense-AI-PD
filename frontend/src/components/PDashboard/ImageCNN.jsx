@@ -79,11 +79,13 @@ export default function ImageAnalyzer() {
       }
     );
     
-    const { prediction, probability, overlay_url } = response.data;
-    const formattedResult = `Prediction: ${prediction}\nProbability: ${(probability * 100).toFixed(2)}%`;
+    const { prediction, heatmap_url, overlay_url } = response.data; //probability
+    const formattedResult = `Prediction: ${prediction}`;
+    // \nProbability: ${(probability * 100).toFixed(2)}%
       setAnalysisResult({
       text: formattedResult,
       overlay_url: overlay_url || null,
+       heatmap_url,
       prediction,
     });
   } catch (error) {
@@ -256,9 +258,23 @@ export default function ImageAnalyzer() {
               {analysisResult.text}
             </div>
 
+            {/* Image Grid */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Heatmap */}
+              {analysisResult.heatmap_url && (
+              <div className="text-center">
+                <h4 className="text-sm text-slate-600 mb-2">Heatmap</h4>
+                <img
+                  src={analysisResult.heatmap_url}
+                  alt="Heatmap"
+                  className="rounded-lg shadow max-h-72 mx-auto"
+                />
+              </div>
+            )}
+            {/* Overlay */}
             {analysisResult.overlay_url && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-slate-600 mb-2">Grad-CAM Visualization:</p>
+              <div className="text-center">
+                <h4 className="text-sm text-slate-600 mb-2">Grad-CAM Visualization</h4>
                 <img
                   src={analysisResult.overlay_url}
                   alt="Model heatmap overlay"
@@ -266,6 +282,7 @@ export default function ImageAnalyzer() {
                 />
               </div>
             )}
+            </div>
 
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mt-4">
               <p className="text-xs text-slate-600">
