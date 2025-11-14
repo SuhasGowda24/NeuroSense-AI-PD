@@ -19,6 +19,7 @@ import Exercise from "./Pages/Dashboard/Patient/Exercise";
 import Community from "./Pages/Dashboard/Patient/Community";
 import AIAssessment from "./Pages/Dashboard/Patient/AIAssessment";
 import ReportCenter from "./Pages/Dashboard/Patient/ReportCenter";
+import GlobalMap from "./Pages/Dashboard/Patient/GlobalMap";
 
 function App() {
   useEffect(() => {
@@ -78,6 +79,7 @@ function App() {
              <Route path="/community" element={<Community />} />
              <Route path="/aiassessment" element={<AIAssessment />} />
              <Route path="/reportcenter" element={<ReportCenter />} />
+             <Route path="/globalmap" element={<GlobalMap />} />
           </Route>
         </Route>
           

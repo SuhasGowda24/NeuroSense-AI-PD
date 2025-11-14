@@ -278,19 +278,19 @@ const handleSetupComplete = (ProfileData) => {
 
 <div className="mb-4"></div>
 
- <Link to="/Community">
+ <Link to="/caregiver">
   <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border border-amber-100 hover:border-amber-300 transition-all duration-200 group cursor-pointer">
     <div className="flex items-start justify-between mb-3">
       <div className="flex-1">
         <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-amber-700 transition-colors">
-          Community
+          Caregiver Corner
         </h4>
         <p className="text-sm text-gray-600 leading-relaxed">
-          Connect with others and share experiences
+          Resources and support for those caring for loved ones with Parkinson's
         </p>
       </div>
       <div className="w-10 h-10 rounded-lg bg-white/60 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-        <Users className="w-5 h-5 text-amber-600" />
+        <Heart className="w-5 h-5 text-amber-600" />
       </div>
     </div>
     <div className="flex items-center justify-between">

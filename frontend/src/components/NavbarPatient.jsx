@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Activity, Pill, Calendar, Heart, Brain, BookHeart } from 'lucide-react';
+import { LayoutDashboard, Activity, Pill, Calendar, Brain, BookHeart, Users } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import SignInButton from "./ui/signInButton";
@@ -15,7 +15,7 @@ export default function NavbarPatient() {
     { title: "Dashboard", icon: LayoutDashboard, path: "/patientdashboard" },
     { title: "Medications", icon: Pill, path: "/medication" },
     { title: "My Journey", icon: Calendar, path: "/journey" },
-    { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
+    { title: "Community", icon: Users, path: "/community" },
     { title: "AI Assessment", icon: Brain, path: "/aiassessment" },
     { title: "Report Center", icon: BookHeart, path: "/reportcenter" },
   ];

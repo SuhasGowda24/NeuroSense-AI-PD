@@ -1,224 +1,203 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Button } from "../../../components/ui/button";
-import { Badge } from "../../../components/ui/badge";
-import { Users, Heart, BookOpen, MapPin, Video, MessageCircle, ExternalLink, PlayCircle } from 'lucide-react';
+import { Users, MapPin, Phone, Mail, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const supportGroups = [
-  {
-    name: "Local Parkinson's Support Group",
-    location: "Community Center, Downtown",
-    schedule: "Every Tuesday, 6:00 PM",
-    members: 45,
-    type: "In-Person"
-  },
-  {
-    name: "Young Onset PD Support",
-    location: "Virtual Meeting",
-    schedule: "First Saturday, 10:00 AM",
-    members: 89,
-    type: "Virtual"
-  },
-  {
-    name: "Caregiver Support Circle",
-    location: "Memorial Hospital",
-    schedule: "Monthly, Last Wednesday",
-    members: 32,
-    type: "In-Person"
-  }
-];
+const SupportGroup = ({ name, description, actions }) => (
+  <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+    <h3 className="text-xl font-semibold text-teal-800 mb-3">{name}</h3>
+    <p className="text-gray-600 mb-4">{description}</p>
+    <div className="flex flex-wrap gap-2">
+      {actions.map((action, idx) => (
+        <a
+          key={idx}
+          href={action.link}
+          target={action.external ? "_blank" : undefined}
+          rel={action.external ? "noopener noreferrer" : undefined}
+          className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+        >
+          {action.icon}
+          {action.label}
+        </a>
+      ))}
+    </div>
+  </div>
+);
 
-const educationalResources = [
-  {
-    title: "Understanding Parkinson's Disease",
-    type: "Video Series",
-    duration: "45 min",
-    icon: PlayCircle
-  },
-  {
-    title: "Exercise Guide for PD Patients",
-    type: "PDF Download",
-    duration: "20 pages",
-    icon: BookOpen
-  },
-  {
-    title: "Nutrition & Parkinson's",
-    type: "Webinar",
-    duration: "1 hour",
-    icon: Video
-  },
-  {
-    title: "Managing Medications Effectively",
-    type: "Guide",
-    duration: "15 min read",
-    icon: BookOpen
-  }
-];
+export default function ParkinsonsConnect() {
+  // const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-const patientStories = [
-  {
-    name: "Sarah M.",
-    title: "Living Well with Parkinson's",
-    excerpt: "Five years after diagnosis, I've learned that PD doesn't define me. Through exercise and community support...",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop"
-  },
-  {
-    name: "James R.",
-    title: "From Diagnosis to Hope",
-    excerpt: "My journey with Parkinson's has taught me resilience. Every day is a new opportunity to...",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop"
-  },
-  {
-    name: "Maria L.",
-    title: "Caregiving with Love",
-    excerpt: "As a caregiver for my husband with PD, I've discovered strength I didn't know I had...",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
-  }
-];
+  const supportGroups = [
+    {
+      name: "PDMDS (Parkinson's Disease & Movement Disorder Society)",
+      description: "India-wide and Karnataka branches. Weekly online sessions and WhatsApp support groups.",
+      actions: [
+        { label: "WhatsApp", link: "https://wa.me/919987216057", icon: <Phone size={16} />, external: true },
+        { label: "Website", link: "https://www.parkinsonssocietyindia.com", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "Basal Ganglia Support Group (Brains Hospital, Bengaluru)",
+      description: "Monthly in-person and virtual meetings, therapy sessions, and community support.",
+      actions: [
+        { label: "Call", link: "tel:+919148080000", icon: <Phone size={16} /> },
+        { label: "Learn More", link: "https://brainshospital.com/Basal-Ganglia-Support-Group", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "SoulUp – Movement Disorder Support",
+      description: "Therapist-led online sessions and WhatsApp peer groups for Parkinson's patients.",
+      actions: [
+        { label: "WhatsApp", link: "https://wa.me/916374897533", icon: <Phone size={16} />, external: true },
+        { label: "Website", link: "https://www.soulup.in/products/support-groups-living-with-a-movement-disorder", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "Parkinson's Disease Society of Karnataka (PDSK)",
+      description: "Regional patient community with meet-ups, awareness drives, and counselling.",
+      actions: [
+        { label: "Email", link: "mailto:pdsk.blr@gmail.com", icon: <Mail size={16} /> }
+      ]
+    },
+    {
+      name: "NIMHANS Movement Disorder Clinic",
+      description: "Specialist clinic with support and educational programs for Parkinson's patients.",
+      actions: [
+        { label: "Email", link: "mailto:mds.nimhans@gmail.com", icon: <Mail size={16} /> },
+        { label: "Website", link: "https://nimhans.ac.in", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "Manipal Hospitals – Young Onset Parkinson's Clinic",
+      description: "Group therapy and online sessions for young Parkinson's patients in Karnataka.",
+      actions: [
+        { label: "Website", link: "https://www.manipalhospitals.com/specialities/parkinson-disease-and-movement-disorder/young-onset-parkinsons-disease-clinic/", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "Amrita Institute of Medical Sciences",
+      description: "Open to all India. Offers WhatsApp counselling and patient support.",
+      actions: [
+        { label: "Website", link: "https://www.amrita.edu/news/parkinsons-disease-patient-support-group-announced-at-amrita-institute-of-medical-sciences/", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "Apollo BGS Hospital (Mysuru)",
+      description: "Local support and therapy sessions for patients and caregivers in Mysuru district.",
+      actions: [
+        { label: "Call", link: "tel:+918214652100", icon: <Phone size={16} /> },
+        { label: "Website", link: "https://www.apollohospitals.com/mysore", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "KMC Mangalore Neurology Support",
+      description: "Movement disorder clinic offering community programs for PD patients.",
+      actions: [
+        { label: "Email", link: "mailto:neurology.kmcmlr@manipal.edu", icon: <Mail size={16} /> },
+        { label: "Website", link: "https://manipal.edu/kmc-mangalore.html", icon: <ExternalLink size={16} />, external: true }
+      ]
+    },
+    {
+      name: "KIMS Hubballi Rehabilitation Center",
+      description: "Awareness, therapy workshops, and patient support network in North Karnataka.",
+      actions: [
+        { label: "Call", link: "tel:+918362370100", icon: <Phone size={16} /> },
+        { label: "Website", link: "https://kimshubli.org", icon: <ExternalLink size={16} />, external: true }
+      ]
+    }
+  ];
 
-export default function Community() {
+  // const scrollToSection = (id) => {
+  //   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  //   setMobileMenuOpen(false);
+  // };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-purple-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-            <Users className="w-8 h-8 text-violet-600" />
-            Community & Support
-          </h1>
-          <p className="text-gray-600">Connect, learn, and find support on your journey</p>
+    <div >
+      {/* Hero Section */}
+      <header id="home" className="bg-teal-700 from-teal-600 to-teal-800 text-white py-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <Users size={64} className="text-teal-200" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Parkinson's Community Connect</h1>
+          <p className="text-xl text-teal-100">Connecting patients, caregivers, and organizations for a stronger support network</p>
         </div>
+      </header>
 
-        <div className="grid lg:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-none shadow-lg">
-            <CardContent className="pt-6 text-center">
-              <Users className="w-12 h-12 text-blue-600 mx-auto mb-3" />
-              <p className="text-3xl font-bold text-gray-900 mb-1">1,200+</p>
-              <p className="text-sm text-gray-600">Community Members</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-none shadow-lg">
-            <CardContent className="pt-6 text-center">
-              <Heart className="w-12 h-12 text-pink-600 mx-auto mb-3" />
-              <p className="text-3xl font-bold text-gray-900 mb-1">50+</p>
-              <p className="text-sm text-gray-600">Support Groups</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-violet-50 border-none shadow-lg">
-            <CardContent className="pt-6 text-center">
-              <BookOpen className="w-12 h-12 text-purple-600 mx-auto mb-3" />
-              <p className="text-3xl font-bold text-gray-900 mb-1">100+</p>
-              <p className="text-sm text-gray-600">Resources Available</p>
-            </CardContent>
-          </Card>
+      {/* About Section */}
+      <section id="about" className="max-w-4xl mx-auto px-4 py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-teal-800 mb-4 flex items-center gap-3">
+            <MapPin className="text-teal-600" />
+            About Us
+          </h2>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            Parkinson's Community Connect brings together verified Parkinson's disease support groups 
+            across India, starting with Karnataka. Our mission is to make it easier for patients and 
+            caregivers to find trusted communities, therapies, and resources — all in one place.
+          </p>
         </div>
+      </section>
 
-        <Card className="shadow-xl border-none mb-8">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              Local Support Groups
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="space-y-4">
-              {supportGroups.map((group, index) => (
-                <div key={index} className="bg-white p-6 rounded-lg border-2 border-gray-100 hover:border-blue-200 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{group.name}</h3>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        <Badge variant="secondary">{group.type}</Badge>
-                        <Badge variant="outline">{group.members} members</Badge>
-                      </div>
-                    </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Join
-                    </Button>
-                  </div>
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-gray-400" />
-                      <span>{group.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Video className="w-4 h-4 text-gray-400" />
-                      <span>{group.schedule}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* View Map CTA */}
+      <section className="max-w-4xl mx-auto px-4 py-8">
+        <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-8 text-center text-white shadow-xl">
+          <MapPin size={48} className="mx-auto mb-4 text-teal-100" />
+          <h2 className="text-2xl font-bold mb-3">Explore Communities Worldwide</h2>
+          <p className="text-teal-100 mb-6">View all Parkinson's support groups on our interactive global map</p>
+          <Link 
+          to="/globalmap"
+        className="inline-flex items-center gap-2 bg-white text-teal-700 px-6 py-3 rounded-lg font-bold text-lg hover:bg-teal-50 transition-all shadow-lg"
+        >
+  <MapPin size={20} />
+  View Global Map
+</Link>
 
-        <Card className="shadow-xl border-none mb-8">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-purple-600" />
-              Educational Resources
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              {educationalResources.map((resource, index) => {
-                const Icon = resource.icon;
-                return (
-                  <div key={index} className="bg-white p-5 rounded-lg border-2 border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-purple-50 rounded-lg">
-                        <Icon className="w-6 h-6 text-purple-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 mb-1">{resource.title}</h3>
-                        <div className="flex gap-2 text-sm text-gray-600">
-                          <Badge variant="secondary" className="text-xs">{resource.type}</Badge>
-                          <span>{resource.duration}</span>
-                        </div>
-                        <Button size="sm" variant="link" className="p-0 h-auto mt-2 text-purple-600">
-                          Access Resource <ExternalLink className="w-3 h-3 ml-1" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        </div>
+      </section>
 
-        <Card className="shadow-xl border-none">
-          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
-            <CardTitle className="flex items-center gap-2">
-              <Heart className="w-5 h-5 text-green-600" />
-              Inspiring Patient Stories
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-3 gap-6">
-              {patientStories.map((story, index) => (
-                <div key={index} className="bg-white rounded-lg overflow-hidden border-2 border-gray-100 hover:shadow-lg transition-shadow">
-                  <img
-                    src={story.image}
-                    alt={story.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-5">
-                    <h3 className="font-bold text-gray-900 mb-1">{story.name}</h3>
-                    <p className="text-sm font-medium text-purple-600 mb-3">{story.title}</p>
-                    <p className="text-sm text-gray-600 mb-4">{story.excerpt}</p>
-                    <Button size="sm" variant="outline" className="w-full">
-                      Read Full Story
-                    </Button>
-                  </div>
-                </div>
-              ))}
+      {/* Support Groups Section */}
+      <section id="groups" className="max-w-6xl mx-auto px-4 py-12">
+        <h2 className="text-3xl font-bold text-teal-800 mb-8 text-center">Support Groups in Karnataka</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          {supportGroups.map((group, idx) => (
+            <SupportGroup key={idx} {...group} />
+          ))}
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="max-w-4xl mx-auto px-4 py-12">
+        <div className="bg-teal-50 rounded-2xl p-8 border-2 border-teal-200">
+          <h2 className="text-3xl font-bold text-teal-800 mb-4">Get in Touch</h2>
+          <p className="text-gray-700 mb-6">
+            Have questions or know another Parkinson's community to list here? We'd love to hear from you!
+          </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-gray-700">
+              <Mail className="text-teal-600" size={20} />
+              <a href="mailto:support@parkinsonsconnect.in" className="hover:text-teal-600">
+                support@parkinsonsconnect.in
+              </a>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex items-center gap-3 text-gray-700">
+              <Phone className="text-teal-600" size={20} />
+              <a href="tel:+919876543210" className="hover:text-teal-600">
+                +91 98765 43210
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-teal-100 text-gray-600 py-8 px-4 mt-12">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-sm">
+            © 2025 Parkinson's Community Connect | This site lists publicly available Parkinson's communities. 
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -311,7 +311,7 @@ export default function CaregiverHub() {
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-lg border-2 border-red-200">
                 <h4 className="font-semibold text-gray-900 mb-2">Medical Emergency</h4>
-                <p className="text-2xl font-bold text-red-600 mb-1">911</p>
+                <p className="text-2xl font-bold text-red-600 mb-1">112</p>
                 <p className="text-xs text-gray-600">For immediate medical assistance</p>
               </div>
               <div className="bg-white p-4 rounded-lg border-2 border-orange-200">

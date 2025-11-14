@@ -5,13 +5,11 @@ import { Badge } from "../../../components/ui/badge";
 import {
   Activity,
   Clock,
-  TrendingUp,
   PlayCircle,
   CheckCircle,
-  Video,
   Dumbbell,
   Heart,
-  Target
+  Target,
 } from 'lucide-react';
 
 const exercisePrograms = [
