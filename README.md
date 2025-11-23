@@ -1,6 +1,6 @@
 Classification-Model Workflow:
 
- ┌───────────────────────────────────────────────────────────┐
+  ┌───────────────────────────────────────────────────────────┐
  │                       USER DRAWING                        │
  │                      (React Canvas)                       │
  └───────────────────────────────────────────────────────────┘
@@ -60,14 +60,14 @@ Classification-Model Workflow:
         4️⃣ Save prediction & confidence
            into the SAME MongoDB record
                  ▼
-    ┌─────────────────────────────────────┐
-    │ MongoDB: now contains:              │
-    │   - imageUrl                        │
-    │   - strokes (points)                │
-    │   - prediction (0/1)                │
-    │   - confidence (0–1)                │
-    │   - message (Positive / Negative)   │
-    └─────────────────────────────────────┘
+    ┌───────────────────────────────────────────────────────┐
+    │ MongoDB: now contains:                                │
+    │   - imageUrl                                           │
+    │   - strokes (points)                                   │
+    │   - prediction (0/1)                                   │
+    │   - confidence (0–1)                                   │
+    │   - message (Positive / Negative)                      │
+    └───────────────────────────────────────────────────────┘
                  │
                  │
         5️⃣ Send prediction back to React
@@ -76,11 +76,12 @@ Classification-Model Workflow:
 ┌───────────────────────────────────────────────────────────┐
 │                React UI (DrawingPad)                      │
 │                                                           │
-│  Shows result:                                            │
-│   ✔ Positive / Negative for PD                            │
+│  Shows results:                                           │
+│   ✔ PD Positive / Negative                                │
 │   ✔ Confidence %                                           │
-│   ✔ Uploaded image                                         │
+│   ✔ Uploaded spiral drawing                                │
 └───────────────────────────────────────────────────────────┘
+
 
 
 
