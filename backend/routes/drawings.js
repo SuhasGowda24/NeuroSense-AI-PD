@@ -31,26 +31,26 @@ const upload = multer({ storage });
 // 📤 POST route — upload drawing image + points
 router.post("/save-drawing", upload.single("image"), async (req, res) => {
   try {
-    const { points } = req.body;
+    const { points, taskType } = req.body;
+    console.log("BACKEND RECEIVED TASK:", taskType);
+
     const parsedPoints = points ? JSON.parse(points) : [];
 
     // 1️⃣ Save image + points to MongoDB
     const drawing = new Drawing({
       imageUrl: req.file.path,
       points: parsedPoints,
+      task_type: taskType || "spiral",
     });
 
     await drawing.save();
-    console.log("Parsed points sample (first 5):", parsedPoints.slice(0,5));
-    console.log("Points length:", parsedPoints.length);
-
 
      // 2️⃣ Call HuggingFace Flask API for analysis{Backend calls it}
     const mlRes = await axios.post(
       "https://suhassgowda-pd-classification-ml.hf.space/analyse",
       {
         strokes: parsedPoints,
-        taskType: "spiral",
+        task_type: taskType || "spiral",
       }
     );
 
@@ -63,14 +63,14 @@ router.post("/save-drawing", upload.single("image"), async (req, res) => {
     await drawing.save();
 
      // 4️⃣ Send response back to frontend
-    res.json({
+    return res.json({
       success: true,
       imageUrl: drawing.imageUrl,
+      task_type: drawing.task_type,
       prediction: drawing.prediction,
       confidence: drawing.confidence,
       message: drawing.message,
     });
-    res.json({ success: true, imageUrl: req.file.path });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Error saving drawing" });

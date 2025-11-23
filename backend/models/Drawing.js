@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const drawingSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
+  task_type: { type: String}, //spiral,l,le chars, etc...
   points: { type: Array },
   prediction: { type: Number },   // 0 or 1
   confidence: { type: Number },   // 0–1
