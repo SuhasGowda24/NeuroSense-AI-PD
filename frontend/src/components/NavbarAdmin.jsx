@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Activity, Pill, Calendar, Heart, Brain, BookHeart, Shield, Bell } from 'lucide-react';
+import { Shield, Bell } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import SignInButton from "./ui/signInButton";

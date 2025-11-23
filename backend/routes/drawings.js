@@ -4,6 +4,8 @@ import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import Drawing from "../models/Drawing.js";
+import axios from "axios";
+
 dotenv.config();
 const router = express.Router();
 
@@ -32,12 +34,42 @@ router.post("/save-drawing", upload.single("image"), async (req, res) => {
     const { points } = req.body;
     const parsedPoints = points ? JSON.parse(points) : [];
 
+    // 1️⃣ Save image + points to MongoDB
     const drawing = new Drawing({
       imageUrl: req.file.path,
       points: parsedPoints,
     });
 
     await drawing.save();
+    console.log("Parsed points sample (first 5):", parsedPoints.slice(0,5));
+    console.log("Points length:", parsedPoints.length);
+
+
+     // 2️⃣ Call HuggingFace Flask API for analysis{Backend calls it}
+    const mlRes = await axios.post(
+      "https://suhassgowda-pd-classification-ml.hf.space/analyse",
+      {
+        strokes: parsedPoints,
+        taskType: "spiral",
+      }
+    );
+
+    const mlData = mlRes.data;
+
+    // 3️⃣ Save prediction into same document
+    drawing.prediction = mlData.prediction;
+    drawing.confidence = mlData.confidence;
+    drawing.message = mlData.message;
+    await drawing.save();
+
+     // 4️⃣ Send response back to frontend
+    res.json({
+      success: true,
+      imageUrl: drawing.imageUrl,
+      prediction: drawing.prediction,
+      confidence: drawing.confidence,
+      message: drawing.message,
+    });
     res.json({ success: true, imageUrl: req.file.path });
   } catch (error) {
     console.error(error);

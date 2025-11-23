@@ -1,0 +1,106 @@
+1-CNN-Model Workflow:
+
+
+
+
+
+
+
+
+2-Classification-Model Workflow:
+
+The Image drawn in frontend(DrawingPad) calculates and shows the Table with -> Y, X Coordinate, TimeStamp, ButtonState, Pressure.
+
+The Backend(Node.js/Express.js) - Image is stored in Cloudinary and the img url is then stored in MongoDB Atlas with the Table Attributes.
+
+After saving Image(URL) + Attribute (points), The Backend(Node.js/Express.js) calls {(the HuggingFace) - Converts the table contents(raw JSON strokes) to ML features(trained handwriting features) and sends the ML required data to ML model to process}.and Then HuggingFace will process by predicting whether the person is PD or not.
+
+HuggingFace prediction + confidence are sent to Backend(Node.js/Express.js).
+
+Then BACKEND stores it in MongoDB.
+
+Backend sends prediction back to frontend UI.
+
+
+
+ ┌───────────────────────────────────────────────────────────┐
+ │                       USER DRAWING                        │
+ │                      (React Canvas)                       │
+ └───────────────────────────────────────────────────────────┘
+                 │
+                 │ User draws → stroke points collected
+                 ▼
+      ┌──────────────────────────────┐
+      │ React: saveDrawing()         │
+      │                              │
+      │ Sends 2 things:              │
+      │  ✔ image (PNG blob)          │
+      │  ✔ points (JSON strokes)     │
+      └──────────────────────────────┘
+                 │
+                 │ POST /drawings/save-drawing
+                 ▼
+╔══════════════════════════════════════════════════════╗
+║                  NODE BACKEND (Express)              ║
+╚══════════════════════════════════════════════════════╝
+                 │
+        1️⃣ Upload image → Cloudinary
+                 │
+                 ▼
+       ┌─────────────────────┐
+       │ Cloudinary Storage  │
+       └─────────────────────┘
+                 │
+                 ▼
+        imageUrl returned to backend
+                 │
+                 │
+        2️⃣ Save drawing metadata in MongoDB  
+        (imageUrl + points)
+                 ▼
+    ┌─────────────────────────────────────┐
+    │ MongoDB: drawings collection        │
+    └─────────────────────────────────────┘
+                 │
+                 │
+        3️⃣ Call HuggingFace Flask Model
+                 │
+                 ▼
+  ┌──────────────────────────────────────┐
+  │   HuggingFace Flask API (/analyse)   │
+  │   ✓ Extract features                 │
+  │   ✓ Run ML model                     │
+  │   ✓ Predict PD or Not PD             │
+  └──────────────────────────────────────┘
+                 │
+                 │ Returns JSON:
+                 │  { prediction, confidence, message }
+                 ▼
+╔══════════════════════════════════════════════════════╗
+║            NODE BACKEND (continue)                   ║
+╚══════════════════════════════════════════════════════╝
+                 │
+        4️⃣ Save prediction & confidence
+           into the SAME MongoDB record
+                 ▼
+    ┌─────────────────────────────────────┐
+    │ MongoDB: now contains:              │
+    │   - imageUrl                        │
+    │   - strokes (points)                │
+    │   - prediction (0/1)                │
+    │   - confidence (0–1)                │
+    │   - message (Positive / Negative)   │
+    └─────────────────────────────────────┘
+                 │
+                 │
+        5️⃣ Send prediction back to React
+                 ▼
+
+┌───────────────────────────────────────────────────────────┐
+│                React UI (DrawingPad)                      │
+│                                                           │
+│  Shows result:                                            │
+│   ✔ Positive / Negative for PD                            │
+│   ✔ Confidence %                                           │
+│   ✔ Uploaded image                                         │
+└───────────────────────────────────────────────────────────┘
