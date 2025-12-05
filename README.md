@@ -1,5 +1,7 @@
+View Convolution Neural Network Machine Learning Model - https://github.com/SuhasGowda24/ML-CNN-PD-Prediction.git
 
-# Getting Started with Create React App
+View Classification Machine Learning Model - https://github.com/SuhasGowda24/ML-Classification-PD-Prediction.git
+# Getting Started with Create React App 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
