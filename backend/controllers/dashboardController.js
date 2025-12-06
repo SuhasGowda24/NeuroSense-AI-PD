@@ -6,7 +6,12 @@ export const getDashboardData = async (req, res) => {
     const { role } = req.user;
 
     if (role === "admin") {
+
+      // Fetch all users
       const users = await User.find({});
+
+      // Fetch logged-in admin's own info
+      const admin = await User.findById(req.user.id).select("-password");
 
       // Normalize roles if needed (e.g., map 'patient' → 'user')
       const formattedUsers = users.map((user) => ({
@@ -16,8 +21,17 @@ export const getDashboardData = async (req, res) => {
 
       return res.json({
         message: "Admin Dashboard Data",
+         admin: {
+          username: admin.username,
+          email: admin.email,
+          avatar: admin.avatar || admin.username[0].toUpperCase(),
+          role: admin.role,
+          lastLogin: admin.lastLogin,
+          loginCount: admin.loginCount,
+          createdAt: admin.createdAt
+        },
         totalUsers: users.length,
-        users: users.map(user => ({ ...user.toObject(), role: user.role === 'patient' ? 'user' : user.role }))
+        users: formattedUsers,
       });
     }
 

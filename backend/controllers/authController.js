@@ -35,6 +35,7 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ message: "User not found" });
+
     //check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
@@ -43,6 +44,12 @@ export const login = async (req, res) => {
     if (user.role !== role) {
       return res.status(403).json({ message: `Role mismatch. Access denied for ${role}` });
     }
+
+    // UPDATE LOGIN METRICS
+    user.lastLogin = new Date();
+    user.loginCount = (user.loginCount || 0) + 1;
+    await user.save();
+
     //create jwt
     const token = jwt.sign(
       { id: user._id, role: user.role },
