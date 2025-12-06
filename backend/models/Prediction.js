@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
 const PredictionSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  
   prediction: String,
 //   probability: Number,
   overlay_url: String,

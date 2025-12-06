@@ -33,18 +33,46 @@ export default function SetupProfile({ user, onComplete }) {
   ];
 
   const handleSymptomToggle = (symptom) => {
-    setFormData(prev => ({
+  setFormData(prev => {
+    const updatedSymptoms = prev.primary_symptoms.includes(symptom)
+      ? prev.primary_symptoms.filter((s) => s !== symptom)
+      : [...prev.primary_symptoms, symptom];
+
+    if (error) setError(null);
+    return {
       ...prev,
-      primary_symptoms: prev.primary_symptoms.includes(symptom)
-        ? prev.primary_symptoms.filter((s) => s !== symptom)
-        : [...prev.primary_symptoms, symptom]
-    }));
-  };
+      primary_symptoms: updatedSymptoms
+    };
+  });
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setError(null);
+
+  // VALIDATION RULES
+  if (!formData.stage) {
+    return setError("Please select your stage.");
+  }
+
+  if (formData.stage !== "caregiver") {
+    if (!formData.diagnosis_date) {
+      return setError("Please enter your diagnosis date.");
+    }
+    if (!formData.age) {
+      return setError("Please enter your age.");
+    }
+    if (formData.primary_symptoms.length === 0) {
+      return setError("Please select at least one primary symptom.");
+    }
+  }
+
+  if (!formData.location.trim()) {
+    return setError("Please enter your location.");
+  }
+  // Continue submitting if no errors
+  setSaving(true);
+
   const token = localStorage.getItem("token"); // get JWT from localStorage
     
   try {
@@ -101,7 +129,7 @@ export default function SetupProfile({ user, onComplete }) {
                 <Heart className="w-4 h-4 text-teal-600" />
                 I am a... *
               </Label>
-              <Select value={formData.stage} onValueChange={(value) => setFormData({...formData, stage: value})}>
+              <Select value={formData.stage} onValueChange={(value) =>{ setFormData({...formData, stage: value}); if (error) setError(null);}}>
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select your situation" />
                 </SelectTrigger>
@@ -125,8 +153,11 @@ export default function SetupProfile({ user, onComplete }) {
                     <Input
                       type="date"
                       value={formData.diagnosis_date}
-                      onChange={(e) => setFormData({...formData, diagnosis_date: e.target.value})}
-                      className="h-12"
+                      onChange={(e) =>{
+                        setFormData({...formData, diagnosis_date: e.target.value});
+                        if (error) setError(null);
+                      }}
+                        className="h-12"
                     />
                   </div>
                   <div className="space-y-2">
@@ -138,7 +169,10 @@ export default function SetupProfile({ user, onComplete }) {
                       type="number"
                       placeholder="Your age"
                       value={formData.age}
-                      onChange={(e) => setFormData({...formData, age: e.target.value})}
+                      onChange={(e) =>{
+                        setFormData({...formData, age: e.target.value});
+                        if (error) setError(null);
+                      }}
                       className="h-12"
                     />
                   </div>
@@ -175,8 +209,11 @@ export default function SetupProfile({ user, onComplete }) {
               <Input
                 placeholder="e.g., Bangalore, Karnataka"
                 value={formData.location}
-                onChange={(e) => setFormData({...formData, location: e.target.value})}
-                className="h-12"
+                onChange={(e) =>{ 
+                  setFormData({...formData, location: e.target.value});
+                  if (error) setError(null);
+                }}
+                  className="h-12"
               />
               <p className="text-xs text-gray-500">This helps us show you relevant local resources</p>
             </div>
