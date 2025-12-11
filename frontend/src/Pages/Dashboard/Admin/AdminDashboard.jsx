@@ -99,10 +99,10 @@ export default function Admin() {
   ];
 
   const quickActions = [
-    { label: "Add User", icon: Users, bg: "bg-blue-100" },
-    { label: "Upload Data", icon: Upload, bg: "bg-green-100" },
+    // { label: "Add User", icon: Users, bg: "bg-blue-100" },
+    { label: "Upload Data", icon: Upload, bg: "bg-green-100", onClick: () => setActiveTab("datasets") },
     { label: "Export Report", icon: Download, bg: "bg-purple-100" },
-    { label: "Schedule Task", icon: Calendar, bg: "bg-orange-100" }
+    // { label: "Schedule Task", icon: Calendar, bg: "bg-orange-100" }
   ];
 
   const getDotColor = (type) => {
@@ -215,7 +215,7 @@ export default function Admin() {
               <CardContent className="p-6 grid grid-cols-2 gap-4">
                 {quickActions.map((a, i) => (
                   <motion.div key={i} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button className="w-full h-28 flex flex-col">
+                    <Button className="w-full h-28 flex flex-col" onClick={a.onClick}>
                       <div className={`w-12 h-12 rounded-full ${a.bg} flex items-center justify-center`}>
                         <a.icon className="w-6 h-6" />
                       </div>
