@@ -5,13 +5,26 @@ import { Button } from "../ui/button";
 export default function SignOutButton() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+
+      if (userId) {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId }),
+        });
+      }
     // clear local auth keys
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("user");
     // navigate to home
     navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (

@@ -50,7 +50,8 @@ export default function AuthPage() {
     // Save JWT token in localStorage
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role); // 'admin' or 'patient'
-
+    localStorage.setItem("userId", data.userId);
+    
     // Redirect based on role
     if (data.role === "admin") {
       navigate("/admindashboard");

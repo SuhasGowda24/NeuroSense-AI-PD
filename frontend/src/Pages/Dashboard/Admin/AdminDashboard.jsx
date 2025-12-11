@@ -1,3 +1,5 @@
+import { io } from "socket.io-client";
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
@@ -42,52 +44,136 @@ export default function Admin() {
 
   const [recentActivity, setRecentActivity] = useState([]);
 
-  // FETCH ADMIN DETAILS
+
   useEffect(() => {
-    const fetchAdmin = async () => {
-      try {
-        const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-        const res = await fetch("/api/dashboard/", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-
-        if (data.admin) {
-      setAdminInfo({
-        name: data.admin.username,
-        email: data.admin.email,
-        avatar: data.admin.avatar || data.admin.username[0].toUpperCase(),
-        role: data.admin.role,
-        lastLogin: data.admin.lastLogin
-    ? new Date(data.admin.lastLogin).toLocaleString()
-    : "N/A",
-
-  loginCount: data.admin.loginCount || 0,
-  createdAt: data.admin.createdAt
-    ? new Date(data.admin.createdAt).toLocaleDateString()
-    : "N/A"
+  const fetchAdminAndActivity = async () => {
+    try {
+      // ─── FETCH ADMIN INFO ───────────────────────────
+      const res = await fetch("/api/dashboard/", {
+        headers: { Authorization: `Bearer ${token}` }
       });
-        }
 
-        // Mock Recent Activity
-        setRecentActivity([
-          { action: "New user registered", user: "Alice Johnson", time: "5 mins ago", type: "success", icon: Users },
-          { action: "Dataset uploaded", user: "Bob Smith", time: "20 mins ago", type: "info", icon: Upload },
-          { action: "System alert resolved", user: "Admin", time: "1 hour ago", type: "success", icon: Shield },
-          { action: "Failed login attempt", user: "Unknown", time: "2 hours ago", type: "warning", icon: Shield }
-        ]);
+      const data = await res.json();
 
-      } catch (err) {
-        console.error("Error fetching admin info:", err);
-      } finally {
-        setLoading(false);
+      if (data.admin) {
+        setAdminInfo({
+          name: data.admin.username,
+          email: data.admin.email,
+          avatar: data.admin.avatar || data.admin.username[0].toUpperCase(),
+          role: data.admin.role,
+          lastLogin: data.admin.lastLogin
+            ? new Date(data.admin.lastLogin).toLocaleString()
+            : "N/A",
+          loginCount: data.admin.loginCount || 0,
+          createdAt: data.admin.createdAt
+            ? new Date(data.admin.createdAt).toLocaleDateString()
+            : "N/A"
+        });
       }
-    };
 
-    fetchAdmin();
-  }, []);
+      // ─── FETCH ACTUAL ACTIVITY FROM BACKEND ─────────
+      const actRes = await fetch("/api/activity/latest"); // new backend route
+      const actData = await actRes.json();
+
+      const mapped = (actData.activities || []).map(a => ({
+        action: a.action,
+        user: a.user,
+        type: a.type,
+        icon: Users,  // you can choose dynamic icons later
+        timestamp: a.timestamp,
+        time: new Date(a.timestamp).toLocaleTimeString(),
+      }));
+
+      setRecentActivity(mapped);
+
+    } catch (err) {
+      console.error("Error loading admin dashboard:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAdminAndActivity();
+
+  // CONNECT SOCKET.IO 
+const socket = io("http://localhost:5000", {   // change to deployed URL later
+  transports: ["websocket"],
+  reconnection: true,
+  reconnectionAttempts: 10,
+});
+
+  // real-time activity listener
+  socket.on("activity:new", (data) => {
+    setRecentActivity(prev => [data, ...prev]);
+  });
+
+  // real-time user status listener
+  socket.on("user:status", ({ userId, username, onlineStatus }) => {
+    setRecentActivity(prev => [
+      {
+        action: onlineStatus ? "Patient logged in" : "Patient logged out",
+        user: username,
+        type: onlineStatus ? "success" : "warning",
+        time: "Just now",
+        icon: Users
+      },
+      ...prev
+    ]);
+  });
+
+  return () => socket.disconnect();
+}, []);
+
+
+
+  // FETCH ADMIN DETAILS
+  // useEffect(() => {
+  //   const fetchAdmin = async () => {
+  //     try {
+  //       const token = localStorage.getItem("token");
+
+  //       const res = await fetch("/api/dashboard/", {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       });
+
+  //       const data = await res.json();
+
+  //       if (data.admin) {
+  //     setAdminInfo({
+  //       name: data.admin.username,
+  //       email: data.admin.email,
+  //       avatar: data.admin.avatar || data.admin.username[0].toUpperCase(),
+  //       role: data.admin.role,
+  //       lastLogin: data.admin.lastLogin
+  //   ? new Date(data.admin.lastLogin).toLocaleString()
+  //   : "N/A",
+
+  // loginCount: data.admin.loginCount || 0,
+  // createdAt: data.admin.createdAt
+  //   ? new Date(data.admin.createdAt).toLocaleDateString()
+  //   : "N/A"
+  //     });
+  //       }
+
+  //       // Mock Recent Activity
+  //       setRecentActivity([
+  //         { action: "New user registered", user: "Alice Johnson", time: "5 mins ago", type: "success", icon: Users },
+  //         { action: "Dataset uploaded", user: "Bob Smith", time: "20 mins ago", type: "info", icon: Upload },
+  //         { action: "System alert resolved", user: "Admin", time: "1 hour ago", type: "success", icon: Shield },
+  //         { action: "Failed login attempt", user: "Unknown", time: "2 hours ago", type: "warning", icon: Shield }
+  //       ]);
+
+  //     } catch (err) {
+  //       console.error("Error fetching admin info:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchAdmin();
+  // }, []);
 
   const tabs = [
     { id: "overview", label: "Overview", icon: BarChart3 },
@@ -108,7 +194,7 @@ export default function Admin() {
   const getDotColor = (type) => {
     switch (type) {
       case "success": return "bg-green-500";
-      case "warning": return "bg-orange-500";
+      case "warning": return "bg-red-600";
       case "info": return "bg-blue-500";
       default: return "bg-gray-500";
     }
@@ -197,7 +283,8 @@ export default function Admin() {
                     </div>
 
                     <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {a.time}
+                      {/* {a.time} */}
+                      {a.time || new Date(a.timestamp).toLocaleTimeString()}
                       <div className={`w-2 h-2 rounded-full ${getDotColor(a.type)}`}></div>
                     </div>
                   </div>

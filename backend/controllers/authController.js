@@ -2,6 +2,9 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+import Activity from "../models/Activity.js";
+
+
 // SIGNUP
 export const signup = async (req, res) => {
   const { username, email, password, role } = req.body;
@@ -50,14 +53,71 @@ export const login = async (req, res) => {
     user.loginCount = (user.loginCount || 0) + 1;
     await user.save();
 
+    // UPDATE ONLINE STATUS (GREEN DOT)
+    user.onlineStatus = true;
+    await user.save();
+
+    // STORE ACTIVITY
+  if (user.role === "patient") {
+    await Activity.create({
+      action: "Patient logged in",
+      user: user.username,
+      type: "success",
+      icon: "Users"
+    });
+
+  req.app.get("io").emit("user:status", {
+    userId: user._id,
+    username: user.username,
+    onlineStatus: true
+  });
+}
+
     //create jwt
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET
     );
 
-    res.json({ token, role: user.role });
+    res.json({ token, role: user.role, userId: user._id });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+// LOGOUT
+export const logout = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    // UPDATE ONLINE STATUS
+    user.onlineStatus = false;
+    await user.save();
+
+    // LOG ACTIVITY
+  if (user.role === "patient") {
+    await Activity.create({
+      action: "Patient logged out",
+      user: user.username,
+      type: "warning",
+      icon: "Users"
+    });
+
+  req.app.get("io").emit("user:status", {
+    userId: user._id,
+    username: user.username,
+    onlineStatus: false
+  });
+}
+
+    res.json({ success: true });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
