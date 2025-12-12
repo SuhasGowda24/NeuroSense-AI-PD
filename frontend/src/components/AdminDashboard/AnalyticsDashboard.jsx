@@ -22,8 +22,12 @@ import {
   Legend, 
   ResponsiveContainer 
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 export default function AnalyticsDashboard() {
+  
+  const navigate = useNavigate();
+
   const [analytics, setAnalytics] = useState({
     totalTests: 0,
     riskDistribution: [],
@@ -121,8 +125,7 @@ export default function AnalyticsDashboard() {
 
       const symptoms = await res.json();
 
-      // ---------------- Tests Over Time (merge symptoms + AI tests) ----------------
-
+      // ---------------- Tests Over Time (merge symptoms + AI tests) 
       // Symptom logs: treat each as 1 "test"
       const symptomTests = symptoms.map(log => ({
         date: log.date,
@@ -193,11 +196,11 @@ export default function AnalyticsDashboard() {
         { name: "High Risk", value: Math.round((highRisk / total) * 100), color: "#ef4444" }
       ];
 
-      // ---------------- Update State ----------------
+      // Update State 
       setAnalytics({
-        totalTests: symptoms.length + aiTestsData.length, // combine
+        totalTests: symptoms.length + aiTestsData.length,
         riskDistribution,
-        testsOverTime,          // ✅ always an array
+        testsOverTime,         
         symptomData
       });
 
@@ -223,7 +226,7 @@ export default function AnalyticsDashboard() {
   return (
     <div className="space-y-6">
 
-      {/* ====================== Overview Stats ====================== */}
+      {/* Overview Stats */}
       <div className="grid md:grid-cols-4 gap-6">
         <Card className="border-none shadow-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white">
           <CardContent className="p-6">
@@ -264,7 +267,7 @@ export default function AnalyticsDashboard() {
         </Card>
       </div>
 
-      {/* ====================== Charts & High-Risk Table ====================== */}
+      {/* Charts & High-Risk Table */}
       <div className="grid lg:grid-cols-2 gap-6">
 
         <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">
@@ -305,6 +308,7 @@ export default function AnalyticsDashboard() {
                   <thead>
                     <tr className="border-b">
                       <th>User ID</th>
+                      <th>User Name</th>
                       <th>Date</th>
                       <th>Tremor</th>
                       <th>Stiffness</th>
@@ -313,8 +317,16 @@ export default function AnalyticsDashboard() {
                   </thead>
                   <tbody>
                     {highRiskPatients.map((p, i) => (
-                      <tr key={i} className="border-b">
-                        <td>{p.userId}</td>
+                      <tr key={i} className={`border-b transition ${
+                                            p.tremor >= 8 || p.stiffness >= 8
+                                              ? "bg-red-100"
+                                              : p.mood <= 3
+                                              ? "bg-orange-100"
+                                              : ""
+                                          }`}>
+                        <td className="text-blue-600 underline cursor-pointer"
+  onClick={() => navigate(`/admin/patient/${p.userId}`)}>{p.userId}</td>
+                        <td>{p.username || "Unknown"}</td>
                         <td>{p.date}</td>
                         <td>{p.tremor}</td>
                         <td>{p.stiffness}</td>
@@ -328,7 +340,7 @@ export default function AnalyticsDashboard() {
           </CardContent>
         </Card>
 
-        {/* ============ Average Symptom Severity Chart ============ */}
+        {/* Average Symptom Severity Chart */}
         <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">
           <CardHeader className="border-b border-gray-100">
             <CardTitle className="flex items-center gap-2">
@@ -351,7 +363,7 @@ export default function AnalyticsDashboard() {
         </Card>
       </div>
 
-      {/* ================= Tests Over Time Chart ================= */}
+      {/* Tests Over Time Chart*/}
       <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">
         <CardHeader className="border-b border-gray-100">
           <CardTitle className="flex items-center gap-2">

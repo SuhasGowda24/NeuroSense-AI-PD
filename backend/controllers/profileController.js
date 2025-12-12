@@ -1,4 +1,5 @@
 import PatientProfile from "../models/PatientProfile.js";
+import User from "../models/User.js";
 
 // POST /api/profile
 export const createOrUpdateProfile = async (req, res) => {
@@ -55,13 +56,58 @@ export const createOrUpdateProfile = async (req, res) => {
 export const getMyProfile = async (req, res) => {
   try {
     const userId = req.user?.id || req.query.userId;
-    if (!userId) return res.status(400).json({ message: "User ID missing" });
 
-    const profile = await PatientProfile.findOne({ userId }).populate("userId", "username email role");
-    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    if (!userId) {
+      return res.status(400).json({ message: "User ID missing" });
+    }
 
-    res.json(profile);
+    // Fetch user info
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch patient profile
+    const profile = await PatientProfile.findOne({ userId });
+
+    // 🟢 RETURN EXACT STRUCTURE YOUR FRONTEND EXPECTS
+    return res.json({
+      user,                  // Contains username, email, createdAt, role...
+      profile: profile || null
+    });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Profile fetch error:", err);
+    return res.status(500).json({ message: err.message });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const getMyProfile = async (req, res) => {
+//   try {
+//     const userId = req.user?.id || req.query.userId;
+//     if (!userId) return res.status(400).json({ message: "User ID missing" });
+
+//     const profile = await PatientProfile.findOne({ userId }).populate("userId", "username email role");
+//     if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+//     res.json(profile);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };

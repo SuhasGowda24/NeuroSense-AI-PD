@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../ui/button";
-import { Badge } from "lucide-react";
+import { Badge } from "../ui/badge";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../../components/ui/select";
 import {
   Users,
@@ -26,6 +27,7 @@ export default function UserManagement() {
   const [hoveredUserId, setHoveredUserId] = useState(null);
   const [cardPosition, setCardPosition] = useState('left');
   const buttonRef = useRef(null);
+  const navigate = useNavigate();
 
   // Add this function to calculate best position
 const calculatePosition = (buttonElement) => {
@@ -174,7 +176,7 @@ const calculatePosition = (buttonElement) => {
               <tbody className="divide-y divide-gray-200">
                 {filteredUsers.map((user, index) => (
                   <motion.tr
-                    key={user.id}
+                    key={user._id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
@@ -292,37 +294,37 @@ const calculatePosition = (buttonElement) => {
 
                           {/* Quick Stats for Patients */}
                           {user.role === 'user' && (
-                            <>
-                              <div className="border-t border-gray-200"></div>
-                              <div className="grid grid-cols-2 gap-2 md:gap-3">
-                                <div className="bg-blue-50 rounded-lg p-2 text-center">
-                                  <p className="text-xs text-gray-500">Appointments</p>
-                                  <p className="text-base md:text-lg font-semibold text-blue-600">
-                                    {user.appointmentCount || 0}
-                                  </p>
-                                </div>
-                                <div className="bg-green-50 rounded-lg p-2 text-center">
-                                  <p className="text-xs text-gray-500">Records</p>
-                                  <p className="text-base md:text-lg font-semibold text-green-600">
-                                    {user.recordCount || 0}
-                                  </p>
-                                </div>
+                          <>
+                            <div className="border-t border-gray-200"></div>
+                            <div className="grid grid-cols-2 gap-2 md:gap-3">
+                              <div className="bg-blue-50 rounded-lg p-2 text-center">
+                                <p className="text-xs text-gray-500">Appointments</p>
+                                <p className="text-base md:text-lg font-semibold text-blue-600">
+                                  {user.appointmentCount || 0}
+                                </p>
                               </div>
-                            </>
-                          )}
+                              <div className="bg-green-50 rounded-lg p-2 text-center">
+                                <p className="text-xs text-gray-500">Records</p>
+                                <p className="text-base md:text-lg font-semibold text-green-600">
+                                  {user.recordCount || 0}
+                                </p>
+                              </div>
+                            </div>
 
-                          {/* Footer Action */}
-                          <Button 
-                            className="w-full mt-2 text-xs md:text-sm" 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              console.log('View full profile:', user);
-                              setHoveredUserId(null);
-                            }}
-                          >
-                            View Full Profile
-                          </Button>
+                            {/* Footer Action - Only for patients */}
+                            <Button 
+                            onClick={() =>{ 
+                            navigate(`/admin/patient/${user.id || user._id}`);
+                            setHoveredUserId(null);
+                             }}
+                              className="w-full mt-2 text-xs md:text-sm" 
+                              variant="outline" 
+                              size="sm"
+                            >
+                              View Full Profile
+                            </Button>
+                          </>
+                        )}
                         </div>
                       </div>
                     )}

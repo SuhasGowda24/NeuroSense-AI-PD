@@ -335,30 +335,6 @@ const downloadHTML = (htmlContent, filename) => {
   window.URL.revokeObjectURL(url);
 };
 
-  // Download Helper
-//  const downloadPDF = async (htmlContent) => {
-//   try {
-//     const res = await fetch(`${API_BASE_URL}/reports/pdf`, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ html: htmlContent })
-//     });
-
-//     const blob = await res.blob();
-//     const url = window.URL.createObjectURL(blob);
-
-//     const a = document.createElement("a");
-//     a.href = url;
-//     a.download = "Medical_Report.pdf";
-//     a.click();
-//     window.URL.revokeObjectURL(url);
-
-//   } catch (err) {
-//     console.error("PDF download error:", err);
-//   }
-// };
-
-
   // Generate AI Report 
   const generateAIAssessmentReport = async () => {
     setIsGenerating(true);

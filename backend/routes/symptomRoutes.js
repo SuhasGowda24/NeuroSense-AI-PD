@@ -1,57 +1,86 @@
 import express from "express";
+import mongoose from "mongoose";
 import SymptomLog from "../models/LogSymptom.js";
 import { verifyToken, verifyAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
+//GET symptom logs (patient OR admin for selected user)
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    // const userId = req.user.id;
+    const targetUserId =
+      req.user.role === "admin" && req.query.userId
+        ? req.query.userId
+        : req.user.id;
+
+        // Validation for admin queries
+    if (req.user.role === "admin" && req.query.userId) {
+      if (!mongoose.Types.ObjectId.isValid(req.query.userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+    }
+
     const limit = parseInt(req.query.limit || "30", 10);
-    const logs = await SymptomLog.find({ userId }).sort({ date: 1 }).limit(limit);
+    const logs = await SymptomLog.find({ userId: targetUserId }).sort({ date: 1 }).limit(limit);
     res.json(logs);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+// GET today's symptom log (patient OR admin for selected user)
 router.get("/today", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const targetUserId =
+      req.user.role === "admin" && req.query.userId
+        ? req.query.userId
+        : req.user.id;
+
+    if (req.user.role === "admin" && req.query.userId) {
+      if (!mongoose.Types.ObjectId.isValid(req.query.userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+    }
     const date = req.query.date || new Date().toISOString().split("T")[0];
-    const log = await SymptomLog.findOne({ userId, date });
+    const log = await SymptomLog.findOne({ userId: targetUserId, date });
     res.json(log || null);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+// ADMIN: GET ALL logs
 router.get("/all", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const logs = await SymptomLog.find().sort({ date: 1 });
+    const logs = await SymptomLog.find().sort({ date: -1 });
     res.json(logs);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+//ADMIN: Get highest risk patients
 router.get("/risk/high", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    // Group by userId → get latest log for each user
-    const latestLogs = await SymptomLog.aggregate([
-      { $sort: { date: -1 } },
-      {
-        $group: {
-          _id: "$userId",
-          latestLog: { $first: "$$ROOT" }
-        }
-      }
-    ]);
-    // Compute risk level
-    const highRiskPatients = latestLogs
-      .map(item => {
-        const log = item.latestLog;
+    // 1. Get ALL logs & populate user info
+    const logs = await SymptomLog.find()
+      .sort({ date: -1 })
+      .populate("userId", "username email"); 
 
+    // 2. Keep only latest log per user
+    const latest = new Map();
+    
+    logs.forEach(log => {
+      const uid = log.userId?._id?.toString();
+      if (!latest.has(uid)) {
+        latest.set(uid, log); // first entry = latest because logs sorted desc
+      }
+    });
+
+    // 3. Filter high-risk patients
+    const highRiskPatients = [...latest.values()]
+      .map(log => {
         const isHigh =
           log.tremor_severity >= 7 ||
           log.stiffness_level >= 7 ||
@@ -60,7 +89,9 @@ router.get("/risk/high", verifyToken, verifyAdmin, async (req, res) => {
         if (!isHigh) return null;
 
         return {
-          userId: item._id,
+          userId: log.userId._id,
+          username: log.userId.username,   
+          email: log.userId.email,
           date: log.date,
           tremor: log.tremor_severity,
           stiffness: log.stiffness_level,
@@ -77,16 +108,26 @@ router.get("/risk/high", verifyToken, verifyAdmin, async (req, res) => {
   }
 });
 
+// WEEKLY AGGREGATE DATA
 router.get("/weekly/:userId", verifyToken, async (req, res) => {
   try {
     const { userId } = req.params;
+
+    // Security: block patients from accessing other patients' data
+    if (req.user.role !== "admin" && req.user.id !== userId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
 
     const logs = await SymptomLog.find({ userId }).sort({ date: 1 });
 
     const weekly = {};
 
     logs.forEach(log => {
-      const day = parseInt(log.date.slice(8, 10));
+      // const day = parseInt(log.date.slice(8, 10));
       const week = `${log.date.slice(0, 4)}-W${Math.ceil(parseInt(log.date.slice(8, 10)) / 7)}`;
 
       if (!weekly[week]) {
@@ -114,7 +155,6 @@ router.get("/weekly/:userId", verifyToken, async (req, res) => {
     }));
 
     res.json(weeklyData);
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -124,6 +164,7 @@ function avg(arr) {
   return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : 0;
 }
 
+// CREATE or UPDATE symptom log for today
 router.post("/", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -141,7 +182,6 @@ if (
   // In future: send email, SMS, push notification
 }
     res.json(doc);
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

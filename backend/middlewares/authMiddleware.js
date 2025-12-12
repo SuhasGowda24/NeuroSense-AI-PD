@@ -8,7 +8,22 @@ export const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // {id, role}
+
+    req.user = {
+      id: decoded.id || decoded._id,   // normalize the decoded JWT payload: 
+      role: decoded.role,
+    };
+
+    if (!req.user.id) {
+      return res
+        .status(400)
+        .json({ message: "Invalid token payload: Missing user ID" });
+    }
+     if (!req.user.role) {
+      return res.status(400).json({
+        message: "Invalid token payload: Missing user role",
+      });
+    }
     next();
   } catch (err) {
     res.status(403).json({ message: "Invalid token" });

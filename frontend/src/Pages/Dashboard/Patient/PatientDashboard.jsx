@@ -104,10 +104,14 @@ export default function PatientDashboard() {
       if (!res.ok) throw new Error(`Failed to fetch profile`);
 
       const data = await res.json();
-      setProfile(data); // Save profile data to local
-      setUser(data.userId); // Set user to the populated user object (includes username)
-      
-      if (!data.stage) setShowSetup(true); // show setup if incomplete
+      setUser(data.user); // Set user to the populated user object (includes username)
+      setProfile(data.profile); // Save profile data to local
+
+      if (!data.profile){
+         setShowSetup(true); // show setup if incomplete
+      }else{
+        setShowSetup(false);
+      }
     } catch (error) {
       console.log("Profile missing, showing setup form");
       setShowSetup(true);

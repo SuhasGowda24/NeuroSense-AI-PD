@@ -20,6 +20,7 @@ import Community from "./Pages/Dashboard/Patient/Community";
 import AIAssessment from "./Pages/Dashboard/Patient/AIAssessment";
 import ReportCenter from "./Pages/Dashboard/Patient/ReportCenter";
 import GlobalMap from "./Pages/Dashboard/Patient/GlobalMap";
+import PatientReportAdmin from "./Pages/Dashboard/Admin/PatientReport";
 
 function App() {
   useEffect(() => {
@@ -87,6 +88,7 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route  element={<AdminLayout />}>
           <Route path="/admindashboard" element={<AdminDashboard />} />
+          <Route path="/admin/patient/:userId" element={<PatientReportAdmin />} />
           </Route>
           </Route>
 

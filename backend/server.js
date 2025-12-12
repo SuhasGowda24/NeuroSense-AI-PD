@@ -4,6 +4,7 @@ import express from "express";
 import http from "http";              // <-- NEW
 import { Server } from "socket.io";
 import activityRoutes from "./routes/activityRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 import connectDB from "./db.js";
 import drawingRoutes from "./routes/drawings.js"
@@ -55,7 +56,7 @@ app.use("/api/drawings", drawingRoutes); // cloudinarystorage data
 app.use("/api/predictions", predictionRoutes); // test data
 app.use("/api/reports", reportRoutes); // reports data
 app.use("/api/activity", activityRoutes); // login & logout of patients
-
+app.use("/api/admin", adminRoutes); // Admin to see all patients data
 // Default route for sanity check
 app.get("/", (req, res) => {
   res.send("Backend server is running successfully!");
