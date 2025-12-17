@@ -2,13 +2,15 @@ import Prediction from "../models/Prediction";
 
 export const getLatestPrediction = async (req, res) => {
   try {
-    const latest = await Prediction.findOne().sort({ timestamp: -1 });
+    const userId = req.user.id;
 
-    if (!latest) {
-      return res.json({ success: true, data: null });
-    }
+    const latest = await Prediction.findOne({ userId }).sort({ timestamp: -1 });
 
-    res.json({ success: true, data: latest });
+    // if (!latest) {
+    //   return res.json({ success: true, data: null });
+    // }
+
+    res.json({ success: true, data: latest || null });
   } catch (e) {
     res.status(500).json({ error: "Server Error" });
   }

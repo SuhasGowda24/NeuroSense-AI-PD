@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const drawingSchema = new mongoose.Schema({
+  userId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User", 
+    required: true 
+  },
   imageUrl: { type: String, required: true },
   task_type: { type: String}, //spiral,l,le chars, etc...
   points: { type: Array },

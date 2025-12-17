@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Loader2 } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -10,6 +11,8 @@ export default function PatientReportAdmin() {
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
+
+  const [drawings, setDrawings] = useState([]);
 
   const reportRef = useRef();
 
@@ -34,6 +37,21 @@ export default function PatientReportAdmin() {
     }
     load();
   }, [userId]);
+
+  useEffect(() => {
+  const fetchDrawings = async () => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `http://localhost:5000/api/drawings/user/${userId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const data = await res.json();
+    setDrawings(data);
+  };
+
+  fetchDrawings();
+}, [userId]);
+
 
   // PDF EXPORT
   const exportPDF = async () => {
@@ -123,6 +141,31 @@ export default function PatientReportAdmin() {
         {/* AI PREDICTION */}
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Latest AI Assessment</h2>
+    
+    <Card>
+  <CardHeader>
+    <CardTitle>Drawing-Based AI Assessment</CardTitle>
+  </CardHeader>
+
+  <CardContent>
+    {drawings.length === 0 ? (
+      <p>No drawings available</p>
+    ) : (
+      drawings.map(d => (
+        <div key={d._id} className="mb-6">
+          <img src={d.imageUrl} className="w-48 rounded-lg" />
+
+          <p><strong>Task:</strong> {d.task_type}</p>
+          <p><strong>Result:</strong> {d.message}</p>
+          <p><strong>Confidence:</strong> {Math.round(d.confidence * 100)}%</p>
+          <p className="text-sm text-gray-500">
+            {new Date(d.createdAt).toLocaleString()}
+          </p>
+        </div>
+      ))
+    )}
+  </CardContent>
+</Card>
 
           {predictions.length > 0 ? (
             <div className="border p-4 rounded-lg bg-gray-50">
@@ -218,234 +261,4 @@ export default function PatientReportAdmin() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-// import React, { useEffect, useState } from "react";
-// import { useParams, useNavigate } from "react-router-dom";
-// import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-// import { Button } from "../../../components/ui/button";
-// import { Loader2, FileDown, Brain, Activity, Pill, BarChart3 } from "lucide-react";
-// import { format, parseISO } from "date-fns";
-
-// export default function PatientReportAdmin() {
-//   const { userId } = useParams();
-//   const [loading, setLoading] = useState(true);
-//   const [profile, setProfile] = useState(null);
-//   const [symptoms, setSymptoms] = useState([]);
-//   const [aiReport, setAiReport] = useState(null);
-//   const [medications, setMedications] = useState([]);
-//   const [journey, setJourney] = useState([]);
-//   const [error, setError] = useState(null);
-//   const navigate = useNavigate();
-  
-//   // Use env variable or fallback
-//   const API = process.env.REACT_APP_API_BASE || "http://localhost:5000/api";
-
-//   useEffect(() => {
-//     let mounted = true;
-//     async function load() {
-//       setLoading(true);
-//       setError(null);
-//       try {
-//         const token = localStorage.getItem("token");
-//         const res = await fetch(`${API}/admin/patient/${userId}/report`, {
-//           headers: { Authorization: `Bearer ${token}` }
-//         });
-
-//         if (!res.ok) {
-//           const txt = await res.text().catch(() => null);
-//           throw new Error(`Server error: ${res.status} ${txt || res.statusText}`);
-//         }
-
-//         const data = await res.json();
-
-//         if (!mounted) return;
-
-//         // Defensive normalization
-//         setProfile(data.user || null);
-//         setSymptoms(Array.isArray(data.symptoms) ? data.symptoms : []);
-//         setMedications(Array.isArray(data.medications) ? data.medications : []);
-//         setJourney(Array.isArray(data.journey) ? data.journey : []);
-//         setAiReport(Array.isArray(data.predictions) && data.predictions.length ? data.predictions[0] : null);
-
-//       } catch (err) {
-//         console.error("Report load error:", err);
-//         if (mounted) setError(err.message || "Failed to load report");
-//       } finally {
-//         if (mounted) setLoading(false);
-//       }
-//     }
-//     load();
-//     return () => { mounted = false; };
-//   }, [userId, API]);
-
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center py-40">
-//         <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="text-center py-20 text-red-600">
-//         <p className="mb-3">Error loading report:</p>
-//         <pre className="text-sm text-left inline-block p-3 bg-red-50 rounded">{error}</pre>
-//       </div>
-//     );
-//   }
-
-//   if (!profile) {
-//     return <p className="text-center text-gray-600 mt-20">User not found.</p>;
-//   }
-
-//   // helper for safe date formatting
-//   const safeFormat = (dateStr, fmt = "PPP") => {
-//     try {
-//       if (!dateStr) return "N/A";
-//       return format(new Date(dateStr), fmt);
-//     } catch {
-//       try { return format(parseISO(dateStr), fmt); } catch { return "Invalid date"; }
-//     }
-//   };
-
-//   return (
-//     <div className="p-8 space-y-8">
-//       <Button onClick={() => navigate("/admindashboard")} className="mb-4 bg-gray-200 hover:bg-gray-300 text-gray-800">
-//         ← Back
-//       </Button>
-
-//       <Card className="shadow-lg border-none">
-//         <CardContent className="p-6">
-//           <h1 className="text-3xl font-bold text-gray-900">Patient Full Report</h1>
-//           <p className="text-gray-600 mt-1">
-//             Viewing report for <strong>{profile.username || profile.name || profile.email || "Unknown"}</strong>
-//           </p>
-//         </CardContent>
-//       </Card>
-
-//       <Card className="shadow-md">
-//         <CardHeader>
-//           <CardTitle>Patient Information</CardTitle>
-//         </CardHeader>
-//         <CardContent className="space-y-3">
-//           <p><strong>Name:</strong> {profile.username || profile.name || "N/A"}</p>
-//           <p><strong>Email:</strong> {profile.email || "N/A"}</p>
-//           <p><strong>Registered:</strong> {safeFormat(profile.createdAt || profile.created_date)}</p>
-//         </CardContent>
-//       </Card>
-
-//       <Card className="shadow-md">
-//         <CardHeader className="flex items-center gap-2">
-//           <Brain className="text-purple-600" />
-//           <CardTitle>Latest AI Assessment</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           {aiReport ? (
-//             <>
-//               <p><strong>Prediction:</strong> {aiReport.prediction ?? aiReport.result ?? "N/A"}</p>
-//               <p><strong>Date:</strong> {safeFormat(aiReport.timestamp || aiReport.createdAt)}</p>
-//               { (aiReport.overlay_url || aiReport.overlayUrl) && (
-//                 <img src={aiReport.overlay_url || aiReport.overlayUrl} alt="overlay" className="w-60 rounded-lg shadow-md mt-3" />
-//               )}
-//             </>
-//           ) : (
-//             <p className="text-gray-500">No AI assessment found.</p>
-//           )}
-//         </CardContent>
-//       </Card>
-
-//       <Card className="shadow-md">
-//         <CardHeader className="flex items-center gap-2">
-//           <Activity className="text-blue-600" />
-//           <CardTitle>Symptom Logs (Recent)</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           {symptoms.length === 0 ? (
-//             <p className="text-gray-500">No symptoms recorded.</p>
-//           ) : (
-//             <table className="w-full text-left mt-3">
-//               <thead>
-//                 <tr>
-//                   <th>Date</th>
-//                   <th>Tremor</th>
-//                   <th>Stiffness</th>
-//                   <th>Mood</th>
-//                   <th>Sleep</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {symptoms.slice(0, 7).map((log, i) => (
-//                   <tr key={log._id ?? i}>
-//                     <td>{safeFormat(log.date)}</td>
-//                     <td>{log.tremor_severity ?? log.tremor ?? "N/A"}</td>
-//                     <td>{log.stiffness_level ?? log.stiffness ?? "N/A"}</td>
-//                     <td>{log.mood_rating ?? log.mood ?? "N/A"}</td>
-//                     <td>{log.sleep_quality ?? log.sleep ?? "N/A"}</td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           )}
-//         </CardContent>
-//       </Card>
-
-//       <Card className="shadow-md">
-//         <CardHeader className="flex items-center gap-2">
-//           <Pill className="text-green-600" />
-//           <CardTitle>Medications</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           {medications.length === 0 ? (
-//             <p className="text-gray-500">No medications found.</p>
-//           ) : (
-//             medications.map((m) => (
-//               <p key={m._id}><strong>{m.name || "Unnamed"}</strong> — {m.dosage || "—"} ({m.frequency || "—"})</p>
-//             ))
-//           )}
-//         </CardContent>
-//       </Card>
-
-//       <Card className="shadow-md">
-//         <CardHeader className="flex items-center gap-2">
-//           <BarChart3 className="text-orange-600" />
-//           <CardTitle>Patient Journey</CardTitle>
-//         </CardHeader>
-//         <CardContent>
-//           {journey.length === 0 ? (
-//             <p className="text-gray-500">No journey entries available.</p>
-//           ) : (
-//             journey.map((j, i) => (
-//               <div key={j._id ?? i} className="mb-3 p-3 bg-gray-100 rounded-lg">
-//                 <strong>{j.title || "Untitled"}</strong>
-//                 <p className="text-sm">{safeFormat(j.date)}</p>
-//                 <p className="text-gray-600">{j.description || ""}</p>
-//               </div>
-//             ))
-//           )}
-//         </CardContent>
-//       </Card>
-
-//       <Button
-//         onClick={() => {
-//           // TODO: implement PDF generation
-//           alert("Download not implemented yet");
-//         }}
-//         className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 mx-auto"
-//       >
-//         <FileDown className="w-5 h-5" />
-//         Download Full PDF
-//       </Button>
-//     </div>
-//   );
-// }
 

@@ -8,21 +8,10 @@ const router = express.Router();
 // GET latest ML prediction
 router.get("/latest",  verifyToken, async (req, res) => {
   try {
-    if (!req.user?._id) {
-      return res.status(400).json({ message: "Missing user ID" });
-    }
-
     const targetUserId =
     req.user.role === "admin" && req.query.userId
       ? req.query.userId
-      : req.user._id;
-
-      // Validate admin lookup ID
-    if (req.user.role === "admin" && req.query.userId) {
-      if (!mongoose.Types.ObjectId.isValid(req.query.userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-    }
+      : req.user.id;
 
     const latest = await Prediction.findOne({ userId: targetUserId }).sort({ timestamp: -1 });
 

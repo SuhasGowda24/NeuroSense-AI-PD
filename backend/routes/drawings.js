@@ -5,6 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import Drawing from "../models/Drawing.js";
 import axios from "axios";
+import { verifyToken } from "../middlewares/authMiddleware.js";
 
 dotenv.config();
 const router = express.Router();
@@ -29,7 +30,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 // 📤 POST route — upload drawing image + points
-router.post("/save-drawing", upload.single("image"), async (req, res) => {
+router.post("/save-drawing", verifyToken, upload.single("image"), async (req, res) => {
   try {
     const { points, taskType } = req.body;
     console.log("BACKEND RECEIVED TASK:", taskType);
@@ -38,6 +39,7 @@ router.post("/save-drawing", upload.single("image"), async (req, res) => {
 
     // 1️⃣ Save image + points to MongoDB
     const drawing = new Drawing({
+      userId: req.user.id,
       imageUrl: req.file.path,
       points: parsedPoints,
       task_type: taskType || "spiral",
@@ -86,5 +88,20 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Error fetching drawings" });
   }
 });
+
+router.get("/user/:userId", verifyToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const drawings = await Drawing
+      .find({ userId })
+      .sort({ createdAt: -1 });
+
+    res.json(drawings);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch drawings" });
+  }
+});
+
 
 export default router;
