@@ -42,7 +42,7 @@ export default function PatientFeedback() {
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch("http://localhost:5000/api/feedback", {
+    await fetch("http://localhost:5000/api/feedback", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,13 +50,9 @@ export default function PatientFeedback() {
       },
       body: JSON.stringify({
         ...formData,
-        source: "general" // important
+        source: "general"
       })
     });
-
-    if (!res.ok) {
-      throw new Error("Failed to submit feedback");
-    }
 
     setSubmitted(true);
 
@@ -64,7 +60,6 @@ export default function PatientFeedback() {
     setTimeout(() => {
       navigate("/reportcenter");
     }, 2000);
-
   } catch (err) {
     console.error(err);
     alert("Failed to submit feedback. Please try again.");
