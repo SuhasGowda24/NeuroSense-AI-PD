@@ -10,48 +10,67 @@ export default function PatientReportAdmin() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  // const [data, setData] = useState(null);
 
-  const [drawings, setDrawings] = useState([]);
+// Core patient data
+const [profile, setProfile] = useState(null);
+const [symptoms, setSymptoms] = useState([]);
+const [medications, setMedications] = useState([]);
+const [journey, setJourney] = useState([]);
+
+// ML reports (VERY IMPORTANT)
+const [cnnReport, setCnnReport] = useState(null);
+const [drawingReport, setDrawingReport] = useState(null);
+  // const [cnnReport, setCnnReport] = useState(null); // Calling CNN Predicted Scores
+  // const [drawings, setDrawings] = useState([]); // Calling Classification Predicted Scores
 
   const reportRef = useRef();
 
   const API = "http://localhost:5000/api";
 
   useEffect(() => {
-    async function load() {
-      try {
-        const token = localStorage.getItem("token");
+  async function load() {
+    try {
+      const token = localStorage.getItem("token");
 
-        const res = await fetch(`${API}/admin/patient/${userId}/report`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      // 1️⃣ Existing admin report (profile, symptoms, meds, journey)
+      const baseRes = await fetch(
+        `${API}/admin/patient/${userId}/report`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const baseData = await baseRes.json();
 
-        const result = await res.json();
-        setData(result);
-      } catch (err) {
-        console.error("Report Load Error:", err);
-      } finally {
-        setLoading(false);
-      }
+      setProfile(baseData.user);
+      setSymptoms(baseData.symptoms);
+      setMedications(baseData.medications);
+      setJourney(baseData.journey);
+
+      // 2️⃣ CNN prediction (SEPARATE BACKEND)
+      const cnnRes = await fetch(
+        `${API}/predictions/latest?userId=${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const cnnData = await cnnRes.json();
+      setCnnReport(cnnData.data);
+
+      // 3️⃣ Drawing prediction (SEPARATE BACKEND)
+      const drawRes = await fetch(
+        `${API}/drawings/user/${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const drawings = await drawRes.json();
+      setDrawingReport(drawings[0] || null); // latest
+
+    } catch (err) {
+      console.error("Report load error:", err);
+    } finally {
+      setLoading(false);
     }
-    load();
-  }, [userId]);
+  }
 
-  useEffect(() => {
-  const fetchDrawings = async () => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(
-      `http://localhost:5000/api/drawings/user/${userId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    const data = await res.json();
-    setDrawings(data);
-  };
-
-  fetchDrawings();
+  load();
 }, [userId]);
-
 
   // PDF EXPORT
   const exportPDF = async () => {
@@ -83,7 +102,9 @@ export default function PatientReportAdmin() {
       heightLeft -= pageHeight;
     }
 
-    pdf.save(`Patient-Report-${data.user.username}.pdf`);
+    // pdf.save(`Patient-Report-${data.user.username}.pdf`);
+    pdf.save(`Patient-Report-${profile?.username || "Patient"}.pdf`);
+
   };
 
   if (loading)
@@ -92,11 +113,6 @@ export default function PatientReportAdmin() {
         <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
       </div>
     );
-
-  if (!data || !data.user)
-    return <p className="text-center text-gray-600 mt-20">User not found.</p>;
-
-  const { user, predictions, symptoms, medications, journey } = data;
 
   return (
     <div className="p-6 md:p-10">
@@ -132,57 +148,66 @@ export default function PatientReportAdmin() {
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Patient Information</h2>
           <div className="grid grid-cols-2 gap-4 text-gray-700">
-            <p><strong>Name:</strong> {user.username}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Registered:</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
+          <p><strong>Name:</strong> {profile?.username}</p>
+          <p><strong>Email:</strong> {profile?.email}</p>
           </div>
         </section>
 
         {/* AI PREDICTION */}
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Latest AI Assessment</h2>
-    
-    <Card>
-  <CardHeader>
-    <CardTitle>Drawing-Based AI Assessment</CardTitle>
-  </CardHeader>
+        {drawingReport && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Drawing Analysis - AI Assessment</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p><b>Task:</b> {drawingReport.task_type}</p>
+              <p><b>Result:</b> {drawingReport.message}</p>
+              <p>
+                <b>Confidence:</b>{" "}
+                {Math.round(drawingReport.confidence * 100)}%
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                {new Date(drawingReport.createdAt).toLocaleString()}
+              </p>
+              <img src={drawingReport.imageUrl} />
+            </CardContent>
+          </Card>
+        )}
 
-  <CardContent>
-    {drawings.length === 0 ? (
-      <p>No drawings available</p>
-    ) : (
-      drawings.map(d => (
-        <div key={d._id} className="mb-6">
-          <img src={d.imageUrl} className="w-48 rounded-lg" />
-
-          <p><strong>Task:</strong> {d.task_type}</p>
-          <p><strong>Result:</strong> {d.message}</p>
-          <p><strong>Confidence:</strong> {Math.round(d.confidence * 100)}%</p>
-          <p className="text-sm text-gray-500">
-            {new Date(d.createdAt).toLocaleString()}
-          </p>
-        </div>
-      ))
-    )}
-  </CardContent>
-</Card>
-
-          {predictions.length > 0 ? (
-            <div className="border p-4 rounded-lg bg-gray-50">
-              <p><strong>Prediction:</strong> {predictions[0].prediction}</p>
-              <p><strong>Date:</strong> {new Date(predictions[0].timestamp).toLocaleString()}</p>
-
-              {predictions[0].overlay_url && (
-                <img
-                  src={predictions[0].overlay_url}
-                  className="mt-4 w-60 rounded shadow"
-                  alt="AI overlay"
-                />
-              )}
-            </div>
-          ) : (
-            <p className="text-gray-500">No prediction available.</p>
-          )}
+        {cnnReport && (
+          <Card>
+            <CardHeader>
+              <CardTitle>AI Image Assessment (CNN)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p><b>Prediction:</b> {cnnReport.prediction}</p>
+              <p>
+                <b>Confidence:</b>{" "}
+                {cnnReport.probability
+                  ? `${Math.round(cnnReport.probability * 100)}%`
+                  : "N/A"}
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                {new Date(cnnReport.timestamp).toLocaleString()}
+              </p>
+                  {cnnReport.overlay_url && (
+                    <img
+                      src={cnnReport.overlay_url}
+                      className="w-72 rounded shadow mt-4"
+                      alt="Grad-CAM Visualization"
+                    />
+                  )}
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-blue-600">
+                    View heatmap
+                  </summary>
+                  <img src={cnnReport.heatmap_url} className="w-60 mt-2" />
+                </details>
+            </CardContent>
+          </Card>
+        )}
         </section>
 
         {/* SYMPTOM LOGS */}

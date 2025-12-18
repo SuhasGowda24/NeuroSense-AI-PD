@@ -69,9 +69,12 @@ export default function AnalyticsDashboard() {
         return [];
       }
 
-      const data = await res.json();
-      setAiTests(data || []);
-      return data || [];
+      const json = await res.json();
+      const tests = Array.isArray(json.data) ? json.data : [];
+
+      setAiTests(tests);
+      return tests;
+
     } catch (err) {
       console.error("Error loading AI tests:", err);
       setAiTests([]);
@@ -133,11 +136,13 @@ export default function AnalyticsDashboard() {
       }));
 
       // AI assessments: group by date
-      const aiCountsByDate = aiTestsData.reduce((acc, test) => {
-        const date = new Date(test.timestamp).toISOString().split("T")[0];
-        acc[date] = (acc[date] || 0) + 1;
-        return acc;
-      }, {});
+      const aiCountsByDate = Array.isArray(aiTestsData)
+      ? aiTestsData.reduce((acc, test) => {
+          const date = new Date(test.timestamp).toISOString().split("T")[0];
+          acc[date] = (acc[date] || 0) + 1;
+          return acc;
+        }, {})
+      : {};
 
       const aiTestData = Object.keys(aiCountsByDate).map(date => ({
         date,
@@ -318,7 +323,7 @@ export default function AnalyticsDashboard() {
                   <tbody>
                     {highRiskPatients.map((p, i) => (
                       <tr key={i} className={`border-b transition ${
-                                            p.tremor >= 8 || p.stiffness >= 8
+                                            p.tremor_severity >= 8 || p.stiffness_level >= 8
                                               ? "bg-red-100"
                                               : p.mood <= 3
                                               ? "bg-orange-100"
@@ -328,9 +333,9 @@ export default function AnalyticsDashboard() {
   onClick={() => navigate(`/admin/patient/${p.userId}`)}>{p.userId}</td>
                         <td>{p.username || "Unknown"}</td>
                         <td>{p.date}</td>
-                        <td>{p.tremor}</td>
-                        <td>{p.stiffness}</td>
-                        <td>{p.mood}</td>
+                        <td>{p.tremor_severity}</td>
+                        <td>{p.stiffness_level}</td>
+                        <td>{p.mood_rating}</td>
                       </tr>
                     ))}
                   </tbody>

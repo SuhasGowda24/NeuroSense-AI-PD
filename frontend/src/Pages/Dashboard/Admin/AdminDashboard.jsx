@@ -25,7 +25,7 @@ import { motion } from "framer-motion";
 import UserManagement from "../../../components/AdminDashboard/UserManagement";
 import AnalyticsDashboard from "../../../components/AdminDashboard/AnalyticsDashboard";
 import DatasetManagement from "../../../components/AdminDashboard/DatasetManagement";
-import SystemLogs from "../../../components/AdminDashboard/SystemLogs";
+// import SystemLogs from "../../../components/AdminDashboard/SystemLogs";
 import FeedbackManagement from "../../../components/AdminDashboard/FeedbackManagement";
 
 export default function Admin() {
@@ -126,61 +126,12 @@ const socket = io("http://localhost:5000", {   // change to deployed URL later
   return () => socket.disconnect();
 }, []);
 
-
-
-  // FETCH ADMIN DETAILS
-  // useEffect(() => {
-  //   const fetchAdmin = async () => {
-  //     try {
-  //       const token = localStorage.getItem("token");
-
-  //       const res = await fetch("/api/dashboard/", {
-  //         headers: { Authorization: `Bearer ${token}` }
-  //       });
-
-  //       const data = await res.json();
-
-  //       if (data.admin) {
-  //     setAdminInfo({
-  //       name: data.admin.username,
-  //       email: data.admin.email,
-  //       avatar: data.admin.avatar || data.admin.username[0].toUpperCase(),
-  //       role: data.admin.role,
-  //       lastLogin: data.admin.lastLogin
-  //   ? new Date(data.admin.lastLogin).toLocaleString()
-  //   : "N/A",
-
-  // loginCount: data.admin.loginCount || 0,
-  // createdAt: data.admin.createdAt
-  //   ? new Date(data.admin.createdAt).toLocaleDateString()
-  //   : "N/A"
-  //     });
-  //       }
-
-  //       // Mock Recent Activity
-  //       setRecentActivity([
-  //         { action: "New user registered", user: "Alice Johnson", time: "5 mins ago", type: "success", icon: Users },
-  //         { action: "Dataset uploaded", user: "Bob Smith", time: "20 mins ago", type: "info", icon: Upload },
-  //         { action: "System alert resolved", user: "Admin", time: "1 hour ago", type: "success", icon: Shield },
-  //         { action: "Failed login attempt", user: "Unknown", time: "2 hours ago", type: "warning", icon: Shield }
-  //       ]);
-
-  //     } catch (err) {
-  //       console.error("Error fetching admin info:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchAdmin();
-  // }, []);
-
   const tabs = [
     { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "users", label: "Users", icon: Users },
     { id: "analytics", label: "Analytics", icon: TrendingUp },
     { id: "datasets", label: "Datasets", icon: Database },
-    { id: "logs", label: "System Logs", icon: FileText },
+    // { id: "logs", label: "System Logs", icon: FileText },
     { id: "feedback", label: "Feedback", icon: AlertCircle }
   ];
 
@@ -319,7 +270,7 @@ const socket = io("http://localhost:5000", {   // change to deployed URL later
         {activeTab === "users" && <UserManagement />}
         {activeTab === "analytics" && <AnalyticsDashboard />}
         {activeTab === "datasets" && <DatasetManagement />}
-        {activeTab === "logs" && <SystemLogs />}
+        {/* {activeTab === "logs" && <SystemLogs />} */}
         {activeTab === "feedback" && <FeedbackManagement />}
 
       </motion.div>

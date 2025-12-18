@@ -19,7 +19,12 @@ router.get("/latest",  verifyToken, async (req, res) => {
       return res.status(404).json({ message: "No predictions found" });
     }
 
-    res.json(latest);
+    // res.json(latest);
+    res.json({
+  success: true,
+  data: latest
+});
+
   } catch (err) {
     console.error("Error fetching latest prediction:", err);
     res.status(500).json({ error: "Server error" });
@@ -38,13 +43,15 @@ router.get("/all", verifyToken, verifyAdmin, async (req, res) => {
     }
      filter.userId = req.query.userId;
     }
-    const tests = await Prediction.find()
-      .populate("userId", "username email") // show user details
-      .sort({ timestamp: -1 });
+    const tests = await Prediction.find(filter)
+  .populate("userId", "username email")
+  .sort({ timestamp: -1 });
 
-    res.json(tests);
+     res.json({
+      success: true,
+      data: tests
+    });
   } catch (err) {
-    console.error("Error fetching all predictions:", err);
     res.status(500).json({ error: "Server error" });
   }
 });

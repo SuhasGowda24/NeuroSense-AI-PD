@@ -90,6 +90,9 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/user/:userId", verifyToken, async (req, res) => {
+  if (req.user.role !== "admin" && req.user.id !== req.params.userId) {
+    return res.status(403).json({ message: "Access denied" });
+  }
   try {
     const { userId } = req.params;
 
