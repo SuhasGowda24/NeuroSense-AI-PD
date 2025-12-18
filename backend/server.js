@@ -16,6 +16,7 @@ import symptomRoutes from "./routes/symptomRoutes.js";
 import journeyRoutes from "./routes/journeyRoutes.js";
 import predictionRoutes from "./routes/predictionRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 import cors from "cors";
 
 // Load environment variables
@@ -57,6 +58,8 @@ app.use("/api/predictions", predictionRoutes); // test data
 app.use("/api/reports", reportRoutes); // reports data
 app.use("/api/activity", activityRoutes); // login & logout of patients
 app.use("/api/admin", adminRoutes); // Admin to see all patients data
+app.use("/api/feedback", feedbackRoutes); // Patients Feedback
+
 // Default route for sanity check
 app.get("/", (req, res) => {
   res.send("Backend server is running successfully!");

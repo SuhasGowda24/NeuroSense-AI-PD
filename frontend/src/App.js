@@ -21,6 +21,7 @@ import AIAssessment from "./Pages/Dashboard/Patient/AIAssessment";
 import ReportCenter from "./Pages/Dashboard/Patient/ReportCenter";
 import GlobalMap from "./Pages/Dashboard/Patient/GlobalMap";
 import PatientReportAdmin from "./Pages/Dashboard/Admin/PatientReport";
+import Feedback from "./Pages/Dashboard/Patient/Feedback";
 
 function App() {
   useEffect(() => {
@@ -81,6 +82,7 @@ function App() {
              <Route path="/aiassessment" element={<AIAssessment />} />
              <Route path="/reportcenter" element={<ReportCenter />} />
              <Route path="/globalmap" element={<GlobalMap />} />
+             <Route path="/feedback" element={<Feedback />} />
           </Route>
         </Route>
           

@@ -59,7 +59,7 @@ function FeedbackItem({ feedback, onUpdate }) {
             )}
           </div>
 
-          <p className="text-gray-900 leading-relaxed mb-3">{feedback.feedback_text}</p>
+          <p className="text-gray-900 leading-relaxed mb-3">{feedback.additional_feedback || "No comments provided"}</p>
 
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <span>From: {feedback.user_email || "Anonymous"}</span>
@@ -176,59 +176,37 @@ export default function FeedbackManagement() {
   }, []);
 
   const loadFeedbacks = async () => {
-    // Simulate loading from API
+  try {
     setLoading(true);
-    setTimeout(() => {
-      const sampleFeedbacks = [
-        {
-          id: 1,
-          user_email: "user1@example.com",
-          feedback_text: "The dashboard loads slowly.",
-          category: "bug_report",
-          status: "pending",
-          rating: 4,
-          submitted_at: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          user_email: "user2@example.com",
-          feedback_text: "Can we have dark mode support?",
-          category: "feature_request",
-          status: "reviewed",
-          rating: 5,
-          response: "Dark mode is being planned for next update.",
-          responded_at: new Date().toISOString(),
-          submitted_at: new Date().toISOString(),
-        },
-        {
-          id: 3,
-          user_email: "user3@example.com",
-          feedback_text: "Model accuracy seems better now!",
-          category: "general",
-          status: "resolved",
-          rating: 5,
-          submitted_at: new Date().toISOString(),
-        },
-      ];
-      setFeedbacks(sampleFeedbacks);
-      setLoading(false);
-    }, 600);
-  };
+    const token = localStorage.getItem("token");
 
-  const updateStatus = (feedbackId, newStatus, response = null) => {
-    setFeedbacks((prev) =>
-      prev.map((f) =>
-        f.id === feedbackId
-          ? {
-              ...f,
-              status: newStatus,
-              response: response || f.response,
-              responded_at: response ? new Date().toISOString() : f.responded_at,
-            }
-          : f
-      )
-    );
-  };
+    const res = await fetch("http://localhost:5000/api/feedback/all", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const json = await res.json();
+    setFeedbacks(json.data || []);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  const updateStatus = async (feedbackId, newStatus, response = null) => {
+  const token = localStorage.getItem("token");
+
+  await fetch(`http://localhost:5000/api/feedback/${feedbackId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status: newStatus, response })
+  });
+
+  loadFeedbacks(); // refresh
+};
 
   if (loading) {
     return (
@@ -238,25 +216,25 @@ export default function FeedbackManagement() {
     );
   }
 
-  const stats = {
-    pending: feedbacks.filter((f) => f.status === "pending").length,
-    reviewed: feedbacks.filter((f) => f.status === "reviewed").length,
-    resolved: feedbacks.filter((f) => f.status === "resolved").length,
-    avgRating:
-      feedbacks.length > 0
-        ? (
-            feedbacks
-              .filter((f) => f.rating)
-              .reduce((sum, f) => sum + f.rating, 0) /
-            feedbacks.filter((f) => f.rating).length
-          ).toFixed(1)
-        : 0,
-  };
+  // const stats = {
+  //   pending: feedbacks.filter((f) => f.status === "pending").length,
+  //   reviewed: feedbacks.filter((f) => f.status === "reviewed").length,
+  //   resolved: feedbacks.filter((f) => f.status === "resolved").length,
+  //   avgRating:
+  //     feedbacks.length > 0
+  //       ? (
+  //           feedbacks
+  //             .filter((f) => f.rating)
+  //             .reduce((sum, f) => sum + f.rating, 0) /
+  //           feedbacks.filter((f) => f.rating).length
+  //         ).toFixed(1)
+  //       : 0,
+  // };
 
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid md:grid-cols-4 gap-6">
+      {/* <div className="grid md:grid-cols-4 gap-6">
         <Card className="border-none shadow-lg bg-gradient-to-br from-yellow-500 to-orange-500 text-white">
           <CardContent className="p-6">
             <Clock className="w-8 h-8 mb-3 opacity-80" />
@@ -288,7 +266,7 @@ export default function FeedbackManagement() {
             <div className="text-purple-100">Avg Rating</div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Feedback List */}
       <Card className="border-none shadow-xl bg-white/90 backdrop-blur-lg">

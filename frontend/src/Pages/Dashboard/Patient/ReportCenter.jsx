@@ -579,6 +579,31 @@ const getReportFunction = (id) => {
             );
           })}
         </div>
+
+         {/* Feedback CTA */}
+<Card className="mt-6 bg-blue-50 border-2 border-blue-200">
+  <CardContent className="p-6 text-center">
+    <h3 className="text-lg font-semibold text-blue-900">
+      Help us improve your experience
+    </h3>
+
+    <p className="text-gray-700 mt-2 max-w-xl mx-auto">
+      Your feedback helps us improve the accuracy, clarity, and comfort of
+      AI-based assessments and reports.
+    </p>
+
+    <Button
+      className="mt-4 bg-blue-600 hover:bg-blue-700">
+         <a href="/feedback">
+          Share Feedback
+        </a>
+    </Button>
+    <p className="text-xs text-gray-500 mt-2">
+      Takes less than 2 minutes • Your responses are confidential
+    </p>
+  </CardContent>
+</Card>
+
             {/* Privacy Notice */}
         <Card className="mt-6 bg-yellow-50 border-2 border-yellow-200">
           <CardContent className="pt-6">
