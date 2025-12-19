@@ -16,6 +16,7 @@ import TrackSymptoms from "./Pages/Dashboard/Patient/TrackSymptoms";
 import Journey from "./Pages/Dashboard/Patient/Journey";
 import Caregiver from "./Pages/Dashboard/Patient/Caregiver";
 import Exercise from "./Pages/Dashboard/Patient/Exercise";
+import ExerciseSymptom from "./components/PDashboard/ExerciseSymptom";
 import Community from "./Pages/Dashboard/Patient/Community";
 import AIAssessment from "./Pages/Dashboard/Patient/AIAssessment";
 import ReportCenter from "./Pages/Dashboard/Patient/ReportCenter";
@@ -78,6 +79,7 @@ function App() {
              <Route path="/journey" element={<Journey />} />
              <Route path="/caregiver" element={<Caregiver />} />
              <Route path="/exercise" element={<Exercise />} />
+             <Route path="/exercisesymptom" element={<ExerciseSymptom />} />
              <Route path="/community" element={<Community />} />
              <Route path="/aiassessment" element={<AIAssessment />} />
              <Route path="/reportcenter" element={<ReportCenter />} />
