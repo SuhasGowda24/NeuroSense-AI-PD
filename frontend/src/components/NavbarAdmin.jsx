@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Bell } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import SignInButton from "./ui/signInButton";
@@ -72,10 +72,10 @@ export default function NavbarAdmin() {
                   <span className="text-sm">{link.title}</span>
                 </Link>
               ))}
-              <button className="p-2 mr-6 hover:bg-gray-100 rounded relative">
+              {/* <button className="p-2 mr-6 hover:bg-gray-100 rounded relative">
                 <Bell className="w-5 h-5 text-gray-600" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              </button> */}
               {/* User: show Logout when logged in, otherwise Sign In */}
               {isLoggedIn ? <SignOutButton /> : <SignInButton />}
             </div>

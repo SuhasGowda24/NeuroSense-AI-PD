@@ -29,7 +29,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-// 📤 POST route — upload drawing image + points
+// POST route — upload drawing image + points
 router.post("/save-drawing", verifyToken, upload.single("image"), async (req, res) => {
   try {
     const { points, taskType } = req.body;
@@ -105,6 +105,20 @@ router.get("/user/:userId", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch drawings" });
   }
 });
+
+// Get latest drawing for logged-in user
+router.get("/latest", verifyToken, async (req, res) => {
+  try {
+    const latest = await Drawing
+      .findOne({ userId: req.user.id })
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, data: latest || null });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to fetch latest drawing" });
+  }
+});
+
 
 
 export default router;

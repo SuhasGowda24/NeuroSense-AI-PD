@@ -138,7 +138,7 @@ const socket = io("http://localhost:5000", {   // change to deployed URL later
   const quickActions = [
     // { label: "Add User", icon: Users, bg: "bg-blue-100" },
     { label: "Upload Data", icon: Upload, bg: "bg-green-100", onClick: () => setActiveTab("datasets") },
-    { label: "Export Report", icon: Download, bg: "bg-purple-100" },
+    { label: "Export Report", icon: Download, bg: "bg-purple-100", onClick: () => setActiveTab("users") },
     // { label: "Schedule Task", icon: Calendar, bg: "bg-orange-100" }
   ];
 

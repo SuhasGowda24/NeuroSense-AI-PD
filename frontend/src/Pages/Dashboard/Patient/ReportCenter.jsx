@@ -7,7 +7,7 @@ import {
   // Download,
   // Activity,
   // Pill,
-  Brain,
+  // Brain,
   BarChart3,
   AlertCircle,
   Loader2,
@@ -18,29 +18,13 @@ import { format, parseISO } from "date-fns";
 
 // Report Categories
 const reportCategories = [
-  {
-    id: "ai_assessment",
-    name: "AI Assessment Reports",
-    icon: Brain,
-    color: "text-purple-600",
-    bg: "bg-purple-50",
-    description: "Scan results and risk predictions",
-  },
   // {
-  //   id: "symptom_tracking",
-  //   name: "Symptom Tracking Reports",
-  //   icon: Activity,
-  //   color: "text-blue-600",
-  //   bg: "bg-blue-50",
-  //   description: "Daily symptom logs and trends",
-  // },
-  // {
-  //   id: "medication",
-  //   name: "Medication Reports",
-  //   icon: Pill,
-  //   color: "text-pink-600",
-  //   bg: "bg-pink-50",
-  //   description: "Adherence rates and side effects",
+  //   id: "ai_assessment",
+  //   name: "AI Assessment Reports",
+  //   icon: Brain,
+  //   color: "text-purple-600",
+  //   bg: "bg-purple-50",
+  //   description: "Scan results and risk predictions",
   // },
   {
     id: "comprehensive",
@@ -88,14 +72,17 @@ export default function ReportCenter() {
   queryFn: () => fetchData("journey"),
 });
 
- const { data: latestAI } = useQuery({
-  queryKey: ["latestPrediction"],
+const { data: latestDrawing } = useQuery({
+  queryKey: ["latestDrawing"],
   queryFn: async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE_URL}/predictions/latest`, {
+    const res = await fetch(`${API_BASE_URL}/drawings/latest`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return res.json();
+
+    if (!res.ok) throw new Error("Failed to fetch latest drawing");
+    const json = await res.json();
+    return json.data;
   }
 });
 
@@ -106,7 +93,7 @@ export default function ReportCenter() {
     <html>
       <head>
         <meta charset="utf-8">
-        <title>${reportType} - ${user.userId?.username || 'Patient'}</title>
+        <title>${reportType} - ${user.user?.username || user.username || "Patient"}</title>
        <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -291,11 +278,11 @@ export default function ReportCenter() {
     <div class="info-grid">
       <div class="info-item">
         <div class="info-label">Patient Name</div>
-        <div class="info-value">${user.userId?.username || 'Patient'}</div>
+        <div class="info-value">${user.user?.username || user.username || "Patient"}</div>
       </div>
       <div class="info-item">
         <div class="info-label">Email</div>
-        <div class="info-value">${user.userId?.email || 'N/A'}</div>
+        <div class="info-value">${user.user?.email || user.email || "N/A"}</div>
       </div>
       <div class="info-item">
         <div class="info-label">Report ID</div>
@@ -336,48 +323,63 @@ const downloadHTML = (htmlContent, filename) => {
 };
 
   // Generate AI Report 
-  const generateAIAssessmentReport = async () => {
-    setIsGenerating(true);
-    setGeneratingType("ai_assessment");
-    try {
-    if (!latestAI) {
-      alert("No AI scan data found.");
-      return;
-    }
+//  const generateAIAssessmentReport = async () => {
+//   setIsGenerating(true);
+//   setGeneratingType("ai_assessment");
 
-    // Always get latest scan
-    const latestScan = latestAI; 
+//   try {
+//     console.log("Latest AI:", latestAI);
 
-      const content = `
-        <h2>AI Assessment</h2>
-        
-        <p><strong>Prediction:</strong> ${latestScan.prediction}</p>
-        <p><strong>Timestamp:</strong> 
-        ${latestScan.timestamp ? format(new Date(latestScan.timestamp), "PPP p") : "N/A"}
-        </p>
+//     if (!latestAI) {
+//       alert("No AI assessment data found.");
+//       return;
+//     }
+//     const latestScan = latestAI;
 
-        ${latestScan.overlay_url ? `
-        <h3 style="margin-top: 20px;">Grad-CAM Overlay</h3>
-        <img src="${latestScan.overlay_url}" 
-             style="border-radius:8px;max-width:360px;box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
-      ` : ""}
-        ${latestScan.heatmap_url ? `
-            <h3 style="margin-top: 20px;">Raw Heatmap</h3>
-            <img src="${latestScan.heatmap_url}" 
-                 style="border-radius:8px;max-width:360px;box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
-          ` : ""}
-        `;
+//     const content = `
+//       <div class="section">
+//         <h2>AI Assessment</h2>
 
-      const html = generateHTMLReport("AI Assessment Report", content);
-      downloadHTML(html, "AI-Assessment-Report.html");
-    } catch (err) {
-      console.error(err);
-      alert("Error generating report");
-    } finally {
-      setIsGenerating(false);
-      setGeneratingType("");
-    }
-  };
+//         <p><strong>Prediction:</strong> ${latestScan.prediction || "N/A"}</p>
+//         <p><strong>Date:</strong> ${
+//           latestScan.timestamp || latestScan.createdAt
+//             ? format(new Date(latestScan.timestamp || latestScan.createdAt), "PPP p")
+//             : "N/A"
+//         }</p>
+
+//         ${
+//           latestScan.overlay_url
+//             ? `
+//           <h3>Grad-CAM Overlay</h3>
+//           <img src="${latestScan.overlay_url}" 
+//                style="max-width:360px;border-radius:8px;" />
+//         `
+//             : ""
+//         }
+
+//         ${
+//           latestScan.heatmap_url
+//             ? `
+//           <h3>Heatmap</h3>
+//           <img src="${latestScan.heatmap_url}" 
+//                style="max-width:360px;border-radius:8px;" />
+//         `
+//             : ""
+//         }
+//       </div>
+//     `;
+
+//     const html = generateHTMLReport("AI Assessment Report", content);
+//     downloadHTML(html, "AI-Assessment-Report.html");
+
+//   } catch (err) {
+//     console.error(err);
+//     alert("Error generating AI assessment report");
+//   } finally {
+//     setIsGenerating(false);
+//     setGeneratingType("");
+//   }
+// };
 
   // Comprehensive Health Report 
   const generateComprehensiveReport = async () => {
@@ -385,7 +387,7 @@ const downloadHTML = (htmlContent, filename) => {
   setGeneratingType('comprehensive');
 
   try {
-    const latestScan = latestAI;
+    // const latestScan = latestAI;
     const recentSymptoms = symptomLogs.slice(0, 7); // Changed to last 7 days
     const reportId = `RPT-${Date.now()}`; // Generate unique report ID
     const reportDate = format(new Date(), 'MMMM d, yyyy'); // Report date
@@ -393,34 +395,39 @@ const downloadHTML = (htmlContent, filename) => {
     const content = `
   <div class="section">
     <h2>Comprehensive Health Summary</h2>
-    <p>This comprehensive report includes all health data from the PD Companion platform for ${user.userId?.username || 'N/A'}.</p>
+    <p>This comprehensive report includes all health data from the PD Companion platform for ${user.user?.username || user.username || 'N/A'}.</p>
   </div>
 
   <div class="section">
     <h2>Report Details</h2>
-    <p><strong>Patient Name:</strong> ${user.userId?.username || 'N/A'}</p>
-    <p><strong>Email:</strong> ${user.userId?.email || 'N/A'}</p>
+    <p><strong>Patient Name:</strong> ${user.user?.username || user.username || 'N/A'}</p>
+    <p><strong>Email:</strong> ${user.user?.email || user.email || "N/A"}</p>
     <p><strong>Report ID:</strong> ${reportId}</p>
     <p><strong>Report Date:</strong> ${reportDate}</p>
   </div>
 
   <div class="section">
-    <h2>1. AI Assessment Status</h2>
-    ${latestScan ? `
-      <p><strong>Prediction:</strong> ${latestScan.prediction}</p>
-      <p><strong>Date:</strong> ${
-        latestScan.timestamp ? format(new Date(latestScan.timestamp), 'MMMM d, yyyy') : 'N/A'
-      }</p>
-      ${latestScan.overlay_url ? `
-        <h3>Overlay Image</h3>
-        <img src="${latestScan.overlay_url}" width="300" style="border-radius:8px;margin-bottom:15px;" />
-        ` : ""}
-         ${latestScan.heatmap_url ? `
-          <h3>Heatmap Image</h3>
-          <img src="${latestScan.heatmap_url}" width="300" style="border-radius:8px;margin-bottom:15px;" />
-          ` : ""}
-          ` : "<p>No AI assessment data available.</p>"}
-    </div>
+  <h2>1. Drawing-Based Motor Assessment</h2>
+
+  ${latestDrawing ? `
+    <p><strong>Task Type:</strong> ${latestDrawing.task_type}</p>
+    <p><strong>Prediction:</strong> ${latestDrawing.message}</p>
+    <p><strong>Confidence:</strong> ${(latestDrawing.confidence * 100).toFixed(2)}%</p>
+    <p><strong>Date:</strong> ${
+      latestDrawing.createdAt
+        ? format(new Date(latestDrawing.createdAt), "MMMM d, yyyy")
+        : "N/A"
+    }</p>
+
+    <h3>Patient Drawing</h3>
+    <img 
+      src="${latestDrawing.imageUrl}"
+      style="max-width:360px;border-radius:8px;border:1px solid #e5e7eb;"
+    />
+  ` : `
+    <p>No drawing-based assessment available.</p>
+  `}
+</div>
 
   <div class="section">
     <h2>2. Symptom Tracking (Last 7 Days)</h2>
@@ -509,16 +516,20 @@ const downloadHTML = (htmlContent, filename) => {
 };
 
   // Choose correct generator 
-const getReportFunction = (id) => {
-  switch (id) {
-    case "ai_assessment":
-      return generateAIAssessmentReport;
-    case "comprehensive":
-      return generateComprehensiveReport;
-    default:
-      return null;
-  }
+  const getReportFunction = (id) => {
+  if (id === "comprehensive") return generateComprehensiveReport;
+  return null;
 };
+// const getReportFunction = (id) => {
+//   switch (id) {
+//     case "ai_assessment":
+//       return generateAIAssessmentReport;
+//     case "comprehensive":
+//       return generateComprehensiveReport;
+//     default:
+//       return null;
+//   }
+// };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-4 md:p-8">
@@ -589,7 +600,7 @@ const getReportFunction = (id) => {
 
     <p className="text-gray-700 mt-2 max-w-xl mx-auto">
       Your feedback helps us improve the accuracy, clarity, and comfort of
-      AI-based assessments and reports.
+      health assessments and medical reports.
     </p>
 
     <Button
