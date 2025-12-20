@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
-import { Pill, BookOpen, Plus, Heart, ArrowRight, Sparkles, Dumbbell, Users, CalendarClock } from "lucide-react";
+import { Pill, BookOpen, Plus, Heart, ArrowRight, Sparkles, Dumbbell, Users, CalendarClock, Lock } from "lucide-react";
 import WelcomeCard from "../../../components/PDashboard/WelcomeCard";
 import QuickStats from "../../../components/PDashboard/QuickStats";
 import SetupProfile from "../../../components/PDashboard/SetupProfile";
@@ -357,14 +357,38 @@ const handleSetupComplete = (ProfileData) => {
               <Dumbbell className="w-6 h-6 mb-2 text-amber-600" />
               <span className="text-sm">Exercise</span>
             </Button>
-            <Button 
+            <div className="relative group">
+  <Button 
+    variant="outline" 
+    className="h-auto py-4 flex-col cursor-not-allowed bg-gray-50/50 transition-all w-full"
+    disabled
+  >
+    <div className="relative">
+      <CalendarClock className="w-6 h-6 mb-2 text-gray-300" />
+      <Lock className="w-3 h-3 absolute -top-0.5 -right-1 text-amber-500" />
+    </div>
+    <span className="text-sm text-gray-400">Appointments</span>
+  </Button>
+  
+  {/* Hover Tooltip */}
+  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 -translate-y-full 
+                  opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none
+                  bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-medium 
+                  px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+    Coming Soon
+    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
+      <div className="border-4 border-transparent border-t-orange-500"></div>
+    </div>
+  </div>
+</div>
+            {/* <Button 
               variant="outline" 
               className="h-auto py-4 flex-col"
               onClick={() => navigate("/Appointments")}
             >
               <CalendarClock className="w-6 h-6 mb-2 text-teal-600" />
               <span className="text-sm">Appointments</span>
-            </Button>
+            </Button> */}
             <Button 
               variant="outline" 
               className="h-auto py-4 flex-col"
