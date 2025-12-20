@@ -134,88 +134,171 @@ export default function DrawingPad() {
 
   // --- FIXED getPointData ---
   const getPointData = useCallback((e, type) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+  const canvas = canvasRef.current;
+  const rect = canvas.getBoundingClientRect();
 
-    const clientX =
-      e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
-    const clientY =
-      e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
+  // Scale factors
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
 
-    // pressure fix
-    let pressure = 1;
-    if (typeof e.pressure === "number") {
-      pressure = e.pressure === 0 ? 0 : e.pressure;
-    } else if (type === "end") {
-      pressure = 0;
-    }
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
 
-    // button fix
-    const button =
-      type === "draw" || type === "start" ? "Pressed" : "Released";
+  let pressure = 1;
+  if (e.pointerType === "pen") {
+    pressure = e.pressure || 0.1;
+  } else if (e.pointerType === "touch") {
+    pressure = 0.5;
+  }
 
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-      time: Date.now(),
-      type,
-      pressure,
-      button,
-    };
-  }, []);
+  return {
+    x,
+    y,
+    time: Date.now(),
+    pressure,
+    button: type === "end" ? "Released" : "Pressed",
+  };
+}, []);
+
+  // const getPointData = useCallback((e, type) => {
+  //   const rect = canvasRef.current.getBoundingClientRect();
+
+  //   const clientX =
+  //     e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
+  //   const clientY =
+  //     e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
+
+  //   // pressure fix
+  //   let pressure = 1;
+  //   if (typeof e.pressure === "number") {
+  //     pressure = e.pressure === 0 ? 0 : e.pressure;
+  //   } else if (type === "end") {
+  //     pressure = 0;
+  //   }
+
+  //   // button fix
+  //   const button =
+  //     type === "draw" || type === "start" ? "Pressed" : "Released";
+
+  //   return {
+  //     x: clientX - rect.left,
+  //     y: clientY - rect.top,
+  //     time: Date.now(),
+  //     type,
+  //     pressure,
+  //     button,
+  //   };
+  // }, []);
 
   // --- Drawing Logic Fixed ---
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   const ctx = canvas.getContext("2d");
+  //   ctx.lineCap = "round";
+  //   ctx.lineWidth = 2;
+  //   ctx.strokeStyle = "#111";
+
+  //   const startDraw = (e) => {
+  //     setIsDrawing(true);
+
+  //     const startData = getPointData(e, "start");
+  //     setPoints((prev) => [...prev, startData]);
+  //   };
+
+  //   const draw = (e) => {
+  //     if (!isDrawing) return;
+
+  //     const newPoint = getPointData(e, "draw");
+
+  //     setPoints((prev) => {
+  //       const updated = [...prev, newPoint];
+  //       const prevPoint = updated[updated.length - 2];
+  //       if (prevPoint) {
+  //         ctx.beginPath();
+  //         ctx.moveTo(prevPoint.x, prevPoint.y);
+  //         ctx.lineTo(newPoint.x, newPoint.y);
+  //         ctx.stroke();
+  //       }
+  //       return updated;
+  //     });
+  //   };
+
+  //   const stopDraw = (e) => {
+  //     if (!isDrawing) return;
+  //     setIsDrawing(false);
+
+  //     const endPoint = getPointData(e, "end");
+  //     setPoints((prev) => [...prev, endPoint]);
+  //   };
+
+  //   canvas.addEventListener("mousedown", startDraw);
+  //   canvas.addEventListener("mousemove", draw);
+  //   canvas.addEventListener("mouseup", stopDraw);
+  //   canvas.addEventListener("mouseleave", stopDraw);
+
+  //   return () => {
+  //     canvas.removeEventListener("mousedown", startDraw);
+  //     canvas.removeEventListener("mousemove", draw);
+  //     canvas.removeEventListener("mouseup", stopDraw);
+  //     canvas.removeEventListener("mouseleave", stopDraw);
+  //   };
+  // }, [isDrawing, getPointData]);
+
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    ctx.lineCap = "round";
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#111";
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
-    const startDraw = (e) => {
-      setIsDrawing(true);
+  const ctx = canvas.getContext("2d");
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#111";
 
-      const startData = getPointData(e, "start");
-      setPoints((prev) => [...prev, startData]);
-    };
+  const startDraw = (e) => {
+    e.preventDefault();
+    canvas.setPointerCapture(e.pointerId);
+    setIsDrawing(true);
+    setPoints((prev) => [...prev, getPointData(e, "start")]);
+  };
 
-    const draw = (e) => {
-      if (!isDrawing) return;
+  const draw = (e) => {
+    if (!isDrawing) return;
+    e.preventDefault();
 
-      const newPoint = getPointData(e, "draw");
+    setPoints((prev) => {
+      const point = getPointData(e, "draw");
+      const updated = [...prev, point];
+      const prevPoint = updated[updated.length - 2];
 
-      setPoints((prev) => {
-        const updated = [...prev, newPoint];
-        const prevPoint = updated[updated.length - 2];
-        if (prevPoint) {
-          ctx.beginPath();
-          ctx.moveTo(prevPoint.x, prevPoint.y);
-          ctx.lineTo(newPoint.x, newPoint.y);
-          ctx.stroke();
-        }
-        return updated;
-      });
-    };
+      if (prevPoint) {
+        ctx.lineWidth = 1 + point.pressure * 3;
+        ctx.beginPath();
+        ctx.moveTo(prevPoint.x, prevPoint.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+      }
+      return updated;
+    });
+  };
 
-    const stopDraw = (e) => {
-      if (!isDrawing) return;
-      setIsDrawing(false);
+  const stopDraw = (e) => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    setPoints((prev) => [...prev, getPointData(e, "end")]);
+  };
 
-      const endPoint = getPointData(e, "end");
-      setPoints((prev) => [...prev, endPoint]);
-    };
+  canvas.addEventListener("pointerdown", startDraw);
+  canvas.addEventListener("pointermove", draw);
+  canvas.addEventListener("pointerup", stopDraw);
+  canvas.addEventListener("pointerleave", stopDraw);
+  canvas.addEventListener("pointercancel", stopDraw);
 
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("mouseup", stopDraw);
-    canvas.addEventListener("mouseleave", stopDraw);
-
-    return () => {
-      canvas.removeEventListener("mousedown", startDraw);
-      canvas.removeEventListener("mousemove", draw);
-      canvas.removeEventListener("mouseup", stopDraw);
-      canvas.removeEventListener("mouseleave", stopDraw);
-    };
-  }, [isDrawing, getPointData]);
+  return () => {
+    canvas.removeEventListener("pointerdown", startDraw);
+    canvas.removeEventListener("pointermove", draw);
+    canvas.removeEventListener("pointerup", stopDraw);
+    canvas.removeEventListener("pointerleave", stopDraw);
+    canvas.removeEventListener("pointercancel", stopDraw);
+  };
+}, [isDrawing, getPointData]);
 
   // --- Clear Canvas ---
   const clearCanvas = () => {
@@ -280,19 +363,38 @@ export default function DrawingPad() {
       setIsUploading(false);
     }
   };
+// ✅ FIXED Download Function (correct scaling)
+const downloadDrawing = () => {
+  const canvas = canvasRef.current;
+
+  // Create an offscreen canvas
+  const exportCanvas = document.createElement("canvas");
+  exportCanvas.width = canvas.width;
+  exportCanvas.height = canvas.height;
+
+  const exportCtx = exportCanvas.getContext("2d");
+
+  // White background (important)
+  exportCtx.fillStyle = "#ffffff";
+  exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+  // Copy drawing exactly
+  exportCtx.drawImage(canvas, 0, 0);
+
+  // Download
+  const link = document.createElement("a");
+  link.download = "drawing.png";
+  link.href = exportCanvas.toDataURL("image/png");
+  link.click();
+};
 
   return (
-    <div className="flex flex-col items-center space-y-6">
+    // <div className="flex flex-col items-center space-y-6">
+    <div className="flex flex-col items-center space-y-6 max-w-lg mx-auto">
       {/* Download Button */}
-      <div className="ml-96">
+      <div className="w-full flex justify-start px-36">
         <button
-          onClick={() => {
-            const canvas = canvasRef.current;
-            const link = document.createElement("a");
-            link.download = "drawing.png";
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-          }}
+          onClick={downloadDrawing}
           disabled={points.length === 0}
           className={`flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium transition-all w-full max-w-xs
           ${
@@ -304,21 +406,60 @@ export default function DrawingPad() {
           <Download className="w-5 h-5 mr-2" />
           Download Drawing
         </button>
+
+        {/* <button
+          onClick={() => {
+            const canvas = canvasRef.current;
+            const link = document.createElement("a");
+            link.download = "drawing.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+          }}
+          disabled={points.length === 0}
+          // className={`flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium transition-all w-full max-w-xs
+           className={`flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium
+          ${
+            points.length === 0
+              ? "bg-gray-300 cursor-not-allowed text-gray-600"
+              : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-md"
+          }`}
+        >
+          <Download className="w-5 h-5 mr-2" />
+          Download Drawing
+        </button> */}
       </div>
 
-      {/* 🔥 Task Selector */}
+      {/* Task Selector */}
       <TaskDropdown selectedTask={taskType} setSelectedTask={setTaskType} />
 
       <h2 className="text-2xl font-semibold text-gray-800">
         Spiral Drawing Test
       </h2>
-
+      <canvas
+  ref={canvasRef}
+  width={
+    window.innerWidth < 640
+      ? 300        // mobile
+      : window.innerWidth < 1024
+      ? 420        // tablet
+      : 480        // desktop (smaller)
+  }
+  height={
+    window.innerWidth < 640
+      ? 200
+      : window.innerWidth < 1024
+      ? 300
+      : 320
+  }
+  className="w-full max-w-md mx-auto border-2 border-gray-600 bg-white rounded-lg shadow-md cursor-crosshair touch-none"
+/>
+{/* 
       <canvas
         ref={canvasRef}
         width={600}
         height={400}
         className="border-2 border-gray-600 bg-white rounded-lg shadow-md cursor-crosshair"
-      ></canvas>
+      ></canvas> */}
 
       {/* Buttons */}
       <div className="flex flex-col items-center space-y-2 w-full">
