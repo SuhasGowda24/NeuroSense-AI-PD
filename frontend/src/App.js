@@ -23,6 +23,14 @@ import ReportCenter from "./Pages/Dashboard/Patient/ReportCenter";
 import GlobalMap from "./Pages/Dashboard/Patient/GlobalMap";
 import PatientReportAdmin from "./Pages/Dashboard/Admin/PatientReport";
 import Feedback from "./Pages/Dashboard/Patient/Feedback";
+import MedGuide from "./Pages/MedGuide";
+import MedDisc from "./Pages/MedDisc";
+import PrivacyPolicy from "./Pages/PrivacyPolicy";
+import Terms from "./Pages/Terms";
+import DataSecurity from "./Pages/DataSecurity";
+import HelpCenter from "./Pages/HelpCenter";
+import ContactSup from "./Pages/ContactSup";
+import FAQ from "./Pages/FAQ";
 
 function App() {
   useEffect(() => {
@@ -68,6 +76,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/assignment" element={<Assignment />} />
           <Route path="/learning" element={<Learning />} />
+          <Route path="/medguide" element={<MedGuide />} />
+          <Route path="/meddisc" element={<MedDisc />} />
+          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/datasecurity" element={<DataSecurity />} />
+          <Route path="/helpcenter" element={<HelpCenter />} />
+          <Route path="/contactsup" element={<ContactSup />} />
+          <Route path="/faq" element={<FAQ />} />
         </Route>
            
            {/* Patient Routes */}

@@ -24,20 +24,20 @@ export default function Footer() {
         platform: [
             { name: 'Home', path: "/" },
             { name: 'Take Assessment', path: "/AuthPage" },
-            { name: 'How It Works', },
+            { name: 'Learn', path: "/learning" },
             // { name: 'Research',}
         ],
         support: [
-            { name: 'Help Center', icon: HelpCircle },
-            { name: 'Contact Support', icon: Mail },
-            { name: 'Medical Guidelines', icon: FileText },
-            { name: 'FAQ', icon: HelpCircle }
+            { name: 'Help Center', icon: HelpCircle, path: "/helpcenter" },
+            { name: 'Contact Support', icon: Mail, path: "/ContactSup" },
+            { name: 'Medical Guidelines', icon: FileText, path: "/medguide" },
+            { name: 'FAQ', icon: HelpCircle, path: "/faq" }
         ],
         legal: [
-            { name: 'Privacy Policy', icon: Shield },
-            { name: 'Terms of Service', icon: FileText },
-            { name: 'Medical Disclaimer', icon: Shield },
-            { name: 'Data Security', icon: Shield }
+            { name: 'Privacy Policy', icon: Shield, path: "/privacypolicy" },
+            { name: 'Terms of Service', icon: FileText, path: "/terms" },
+            { name: 'Medical Disclaimer', icon: Shield, path: "/meddisc" },
+            { name: 'Data Security', icon: Shield, path: "/datasecurity" }
         ]
     };
 
