@@ -16,28 +16,25 @@ export default function Medication() {
   const [editingMed, setEditingMed] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const token = localStorage.getItem("token"); // JWT stored at login
   const [adherence, setAdherence] = useState({}); // { medId: { time: 'taken' | 'not-taken' | null } }
 
-  useEffect(() => {
-    loadMedications();
-  }, []);
+const fetchAdherence = async () => {
+  try {
+    const response = await axiosClient.get('/medications/logs');
+    const logs = response.data;
+    const adherenceMap = {};
+    logs.forEach(log => {
+      if (!adherenceMap[log.medId]) adherenceMap[log.medId] = {};
+      adherenceMap[log.medId][log.time] = log.status;
+    });
+    setAdherence(adherenceMap);
+  } catch (error) {
+    console.error('Error fetching adherence logs:', error);
+  }
+};
 
-  useEffect(() => {
-  const fetchAdherence = async () => {
-    try {
-      const response = await axiosClient.get('/medications/logs');
-      const logs = response.data;
-      const adherenceMap = {};
-      logs.forEach(log => {
-        if (!adherenceMap[log.medId]) adherenceMap[log.medId] = {};
-        adherenceMap[log.medId][log.time] = log.status;
-      });
-      setAdherence(adherenceMap);
-    } catch (error) {
-      console.error('Error fetching adherence logs:', error);
-    }
-  };
+useEffect(() => {
+  loadMedications();
   fetchAdherence();
 }, []);
 
@@ -45,12 +42,8 @@ export default function Medication() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/medications", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch medications");
-      const data = await res.json();
-      setMedications(data);
+        const res = await axiosClient.get("/medications");
+        setMedications(res.data);
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -63,29 +56,15 @@ export default function Medication() {
     try {
       if (editingMed) {
          // Update medication
-        const res = await fetch(`/api/medications/${editingMed._id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(medData),
-        });
-        if (!res.ok) throw new Error("Failed to update medication");
+        await axiosClient.put(`/medications/${editingMed._id}`, medData);
       } else {
         // Create new medication
-        const res = await fetch("/api/medications", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(medData),
-        });
-        if (!res.ok) throw new Error("Failed to add medication");
+        await axiosClient.post("/medications", medData);
       }
       setShowForm(false);
       setEditingMed(null);
+
+      await fetchAdherence();
       loadMedications();
     } catch (err) {
       console.error("Error saving medication:", err);
@@ -101,11 +80,9 @@ export default function Medication() {
   const handleDelete = async (medId) => {
      if (!window.confirm("Are you sure you want to delete this medication?")) return;
     try {
-      const res = await fetch(`/api/medications/${medId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to delete medication");
+      await axiosClient.delete(`/medications/${medId}`);
+      
+      await fetchAdherence(); // refresh logs
       loadMedications();
     } catch (err) {
       console.error("Error deleting medication:", err);

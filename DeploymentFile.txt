@@ -10,4 +10,5 @@ Final system is connected
 
 
 Starting with Backend Deployment in Render:
-1.
+1. Backend Deployment: "https://neurosense-ai-pd.onrender.com"
+2. 

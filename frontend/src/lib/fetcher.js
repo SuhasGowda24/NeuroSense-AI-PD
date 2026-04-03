@@ -1,6 +1,7 @@
 export async function apiFetch(url, options = {}) {
-  const token = localStorage.getItem("token"); // stored after login
-  const res = await fetch(`http://localhost:5000/api${url}`, {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

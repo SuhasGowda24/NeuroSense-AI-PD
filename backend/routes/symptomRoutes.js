@@ -22,10 +22,19 @@ router.get("/", verifyToken, async (req, res) => {
     }
 
     const limit = parseInt(req.query.limit || "30", 10);
-    const logs = await SymptomLog.find({ userId: targetUserId }).sort({ date: 1 }).limit(limit);
+   const userObjectId = new mongoose.Types.ObjectId(targetUserId);
+
+const logs = await SymptomLog.find({
+  userId: userObjectId
+})
+.sort({ date: 1 })
+.limit(limit);
     res.json(logs);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+  message: "Internal server error",
+  error: err.message
+});
   }
 });
 
@@ -43,7 +52,12 @@ router.get("/today", verifyToken, async (req, res) => {
       }
     }
     const date = req.query.date || new Date().toISOString().split("T")[0];
-    const log = await SymptomLog.findOne({ userId: targetUserId, date });
+   const userObjectId = new mongoose.Types.ObjectId(targetUserId);
+
+const log = await SymptomLog.findOne({
+  userId: userObjectId,
+  date
+});
     res.json(log || null);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -122,7 +136,9 @@ router.get("/weekly/:userId", verifyToken, async (req, res) => {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const logs = await SymptomLog.find({ userId }).sort({ date: 1 });
+    const logs = await SymptomLog.find({
+  userId: new mongoose.Types.ObjectId(userId)
+}).sort({ date: 1 });
 
     const weekly = {};
 
@@ -167,21 +183,37 @@ function avg(arr) {
 // CREATE or UPDATE symptom log for today
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userObjectId = new mongoose.Types.ObjectId(req.user.id);
     const { date } = req.body;
-    const update = { ...req.body, userId };
-    const options = { upsert: true, new: true, setDefaultsOnInsert: true };
-    const doc = await SymptomLog.findOneAndUpdate({ userId, date }, update, options);
-  // HIGH RISK ALERT
-if (
-  doc.tremor_severity >= 7 ||
-  doc.stiffness_level >= 7 ||
-  doc.mood_rating <= 3
-) {
-  console.log("🚨 HIGH-RISK ALERT for user:", userId);
-  // In future: send email, SMS, push notification
-}
+
+    const update = {
+      ...req.body,
+      userId: userObjectId
+    };
+
+    const options = {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true
+    };
+
+    const doc = await SymptomLog.findOneAndUpdate(
+      { userId: userObjectId, date },
+      update,
+      options
+    );
+
+    // HIGH RISK ALERT
+    if (
+      doc.tremor_severity >= 7 ||
+      doc.stiffness_level >= 7 ||
+      doc.mood_rating <= 3
+    ) {
+      console.log("🚨 HIGH-RISK ALERT for user:", req.user.id);
+    }
+
     res.json(doc);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

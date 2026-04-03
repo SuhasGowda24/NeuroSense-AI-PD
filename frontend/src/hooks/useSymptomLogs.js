@@ -1,21 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "../lib/fetcher";
+import axiosClient from "../lib/axiosClient";
 
 export function useSymptomLogs(limit = 30) {
   return useQuery({
     queryKey: ['symptomLogs', limit],
-    queryFn: () => apiFetch(`/symptom-logs?limit=${limit}`),
+    queryFn: async () => {
+      const res = await axiosClient.get(`/symptom-logs?limit=${limit}`);
+      return res.data;
+    },
     initialData: [],
   });
 }
 
 export function useUpsertSymptom() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload) => apiFetch('/symptom-logs', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+    mutationFn: async (payload) => {
+      const res = await axiosClient.post("/symptom-logs", payload);
+      return res.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['symptomLogs'] });
     },

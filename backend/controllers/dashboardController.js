@@ -1,9 +1,16 @@
 import User from "../models/User.js";
+import mongoose from "mongoose";
 import PatientProfile from "../models/PatientProfile.js";
+import Prediction from "../models/Prediction.js";
+// import Report from "../models/Report.js";
+import Symptom from "../models/LogSymptom.js";
+import Medication from "../models/Medications.js";
+import Journey from "../models/JourneyEvent.js";
+
 
 export const getDashboardData = async (req, res) => {
   try {
-    const { role } = req.user;
+    const { role, id } = req.user;
 
     if (role === "admin") {
 
@@ -35,12 +42,27 @@ export const getDashboardData = async (req, res) => {
       });
     }
 
+    const userObjectId = new mongoose.Types.ObjectId(id);
+
+    const predictions = await Prediction.find({ userId: userObjectId });
+    const symptoms = await Symptom.find({ userId: userObjectId });
+    const medications = await Medication.find({ userId: userObjectId });
+    const journey = await Journey.find({ userId: userObjectId });
+   console.log("JWT ID:", id);
+console.log("ObjectId:", userObjectId);
+    
     // this now runs only for non-admin users (like patients)
     return res.json({
       message: "Patient Dashboard Data",
       profile: req.user,
+      predictions,
+      // reports,
+      symptoms,
+      medications,
+      journey
     });
   } catch (err) {
+
     console.error("Error in getDashboardData:", err);
     res.status(500).json({ message: err.message });
   }
