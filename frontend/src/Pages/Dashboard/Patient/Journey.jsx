@@ -26,7 +26,7 @@ export default function Journey() {
       console.error("Error loading events:", err);
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
      const handleSubmit = async (formData) => {
     try {

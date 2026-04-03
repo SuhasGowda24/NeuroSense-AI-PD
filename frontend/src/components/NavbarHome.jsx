@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Heart, Activity, BookOpen, House } from "lucide-react";
@@ -11,11 +11,11 @@ export default function NavbarHome() {
   const [activeItem, setActiveItem] = useState("Home");
   const location = useLocation(); 
 
-  const navigationLinks = [
+  const navigationLinks = useMemo(() => [
     { name: "Home", path: "/", icon: House },
     { name: "Assessment", path: "/assignment", icon: Activity },
     { name: "Learning", path: "/Learning", icon: BookOpen },
-  ];
+  ], []);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   // const handleLanguageChange = (lang) => setCurrentLang(lang);
@@ -29,7 +29,7 @@ export default function NavbarHome() {
     } else {
       setActiveItem("Home");
     }
-  }, [location.pathname]);
+  }, [location.pathname, navigationLinks]);
 
   return (
     <nav className="bg-white/95 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-50 shadow-sm">

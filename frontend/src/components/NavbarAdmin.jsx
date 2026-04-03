@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Shield } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -11,14 +11,14 @@ export default function NavbarAdmin() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  const navigationLinks = [
+  const navigationLinks = useMemo(() =>[
     // { title: "Dashboard", icon: LayoutDashboard, path: "/Admindashboard" },
     // { title: "Medications", icon: Pill, path: "/medication" },
     // { title: "My Journey", icon: Calendar, path: "/journey" },
     // { title: "Caregiver Corner", icon: Heart, path: "/caregiver" },
     // { title: "AI Assessment", icon: Brain, path: "/aiassessment" },
     // { title: "Report Center", icon: BookHeart, path: "/reportcenter" },
-  ];
+  ], []);
 
   // update login state when location changes (simple heuristic)
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function NavbarAdmin() {
     } else {
       setActiveItem("Dashboard"); // fallback default
     }
-  }, [location.pathname]);
+  }, [location.pathname, navigationLinks]);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
