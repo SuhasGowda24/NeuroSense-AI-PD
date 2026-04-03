@@ -43,7 +43,9 @@ app.set("io", io);
 
 
 // Middleware
-app.use(cors()); // Allow frontend to connect
+app.use(cors({
+  origin: "*", // later replace with your Vercel URL
+})); // Allow frontend to connect
 app.use(express.json());
 
 // Routes
@@ -73,7 +75,7 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 // app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

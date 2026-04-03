@@ -1,0 +1,13 @@
+🔹 Frontend → Vercel
+🔹 Backend → Render
+🔹 ML → Hugging Face (already done)
+    DB → MongoDB Atlas
+
+
+Backend APIs are deployed & tested
+Frontend integrates with live APIs
+Final system is connected
+
+
+Starting with Backend Deployment in Render:
+1.
