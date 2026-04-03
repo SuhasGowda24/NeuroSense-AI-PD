@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { LayoutDashboard, Activity, Pill, Calendar, Brain, BookHeart, Users } from 'lucide-react';
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -11,19 +11,19 @@ export default function NavbarPatient() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  const navigationLinks = [
+  const navigationLinks = useMemo(() => [
     { title: "Dashboard", icon: LayoutDashboard, path: "/patientdashboard" },
     { title: "Medications", icon: Pill, path: "/medication" },
     { title: "My Journey", icon: Calendar, path: "/journey" },
     { title: "Community", icon: Users, path: "/community" },
     { title: "AI Assessment", icon: Brain, path: "/aiassessment" },
     { title: "Report Center", icon: BookHeart, path: "/reportcenter" },
-  ];
+  ], []);
 
   // update login state when location changes (simple heuristic)
   useEffect(() => {
     setIsLoggedIn(!!localStorage.getItem("token"));
-  }, [location.pathname]);
+  }, [location.pathname, navigationLinks]);
 
   useEffect(() => {
     const current = navigationLinks.find(

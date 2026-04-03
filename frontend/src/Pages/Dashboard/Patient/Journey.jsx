@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Plus, Calendar } from "lucide-react";
@@ -15,7 +15,7 @@ export default function Journey() {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
-   const loadEvents = async () => {
+   const loadEvents = useCallback(async () => {
     try {
       const res = await axiosClient.get("/journey", {
         headers: { Authorization: `Bearer ${token}` }
@@ -26,7 +26,7 @@ export default function Journey() {
       console.error("Error loading events:", err);
       setLoading(false);
     }
-  };
+  }, []);
 
      const handleSubmit = async (formData) => {
     try {
@@ -63,9 +63,9 @@ export default function Journey() {
     }
   };
 
-  useEffect(() => {
-    loadEvents();
-  }, []);
+ useEffect(() => {
+  loadEvents();
+}, [loadEvents]);
 
   return (
     <div className="p-4 lg:p-8 space-y-6 max-w-6xl mx-auto">

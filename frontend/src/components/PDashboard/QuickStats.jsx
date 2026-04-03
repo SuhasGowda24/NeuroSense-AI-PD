@@ -5,18 +5,6 @@ import { Activity, Calendar, Pill } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function QuickStats({ symptoms, events, medications = [] }) {
-  const getAverageSymptomSeverity = () => {
-    if (!Array.isArray(symptoms) || symptoms.length === 0) return 0;
-    const total = symptoms.reduce((sum, s) => {
-      const avg =
-        ((s.tremor_severity || 0) +
-          (s.rigidity_severity || 0) +
-          (s.mobility_difficulty || 0)) /
-        3;
-      return sum + avg;
-    }, 0);
-    return (total / symptoms.length).toFixed(1);
-  };
 
   const uniqueDaysCount = Array.isArray(symptoms)
     ? new Set(symptoms.map((s) => s.date)).size

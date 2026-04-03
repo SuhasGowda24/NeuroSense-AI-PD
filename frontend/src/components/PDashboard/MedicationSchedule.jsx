@@ -45,26 +45,32 @@ const [clickedButtons, setClickedButtons] = useState(new Set());
         [medId]: { ...prev[medId], [time]: 'taken' }
       }));
     }
-
+    setIsLoading(true);
     // Save to backend in background
     try {
-      await axiosClient.post('/medications/logs', logData);
-    } catch (error) {
-      console.error('Error saving log:', error);
-      // Revert state on error
-      setLogs(prev => prev.filter(log => log !== logData));
-      if (typeof setAdherence === 'function') {
-        setAdherence(prev => ({
-          ...prev,
-          [medId]: { ...prev[medId], [time]: undefined }
-        }));
-      }
-      setClickedButtons((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(buttonKey);
-        return newSet;
-      });
-    }
+  await axiosClient.post('/medications/logs', logData);
+} catch (error) {
+  console.error('Error saving log:', error);
+
+  // Revert state on error
+  setLogs(prev => prev.filter(log => log !== logData));
+
+  if (typeof setAdherence === 'function') {
+    setAdherence(prev => ({
+      ...prev,
+      [medId]: { ...prev[medId], [time]: undefined }
+    }));
+  }
+
+  setClickedButtons((prev) => {
+    const newSet = new Set(prev);
+    newSet.delete(buttonKey);
+    return newSet;
+  });
+
+} finally {
+  setIsLoading(false); 
+}
   };
 
   const getAllTimes = () => {

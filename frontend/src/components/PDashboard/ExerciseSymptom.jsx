@@ -42,7 +42,7 @@ export default function SymptomExerciseSection({
       <div className="grid md:grid-cols-3 gap-4">
         {filteredPrograms.map(program => (
           <div key={program.id} className="bg-white rounded-xl shadow p-4">
-            <img src={program.image} className="h-32 w-full object-cover rounded" />
+            <img src={program.image} alt="exercise" className="h-32 w-full object-cover rounded" />
             <h3 className="font-bold mt-2">{program.title}</h3>
 
             <div className="text-sm text-gray-600 flex items-center gap-1">
