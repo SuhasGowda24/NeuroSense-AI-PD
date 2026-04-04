@@ -643,7 +643,207 @@
   }
 }
 
+/* ===== ENHANCED AUTH RESPONSIVENESS ===== */
 
+/* Tablet View (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .auth-box {
+    width: 750px;
+    height: 550px;
+  }
+  
+  .form-container {
+    max-width: 340px;
+  }
+  
+  .form-container h1 {
+    font-size: 24px;
+  }
+  
+  .form-container p {
+    font-size: 13px;
+    margin-bottom: 25px;
+  }
+  
+  .panel h2 {
+    font-size: 26px;
+  }
+  
+  .panel p {
+    font-size: 14px;
+  }
+  
+  .input-field {
+    font-size: 13px;
+    padding: 11px 12px 11px 42px;
+  }
+  
+  .left-form {
+    padding-left: 40px;
+  }
+  
+  .right-form {
+    padding-right: 40px;
+  }
+}
+
+/* Large Mobile / Small Tablet (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .auth-mobile {
+    max-width: 500px;
+  }
+  
+  .mobile-header {
+    padding: 35px 25px;
+  }
+  
+  .mobile-header h2 {
+    font-size: 26px;
+  }
+  
+  .mobile-forms {
+    padding: 35px 25px;
+  }
+  
+  .input-field {
+    font-size: 15px;
+    padding: 13px 14px 13px 45px;
+  }
+  
+  .action-btn {
+    padding: 14px 0;
+    font-size: 15px;
+  }
+}
+
+/* Small Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 10px;
+  }
+  
+  .auth-mobile {
+    border-radius: 12px;
+  }
+  
+  .mobile-header {
+    padding: 25px 20px;
+  }
+  
+  .mobile-header h2 {
+    font-size: 22px;
+  }
+  
+  .mobile-header p {
+    font-size: 13px;
+  }
+  
+  .mobile-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .mobile-forms {
+    padding: 25px 20px;
+  }
+  
+  .form-container h1 {
+    font-size: 24px;
+  }
+  
+  .form-container p {
+    font-size: 13px;
+    margin-bottom: 25px;
+  }
+  
+  .form-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+  }
+  
+  .input-wrapper {
+    margin-bottom: 12px;
+  }
+  
+  .input-field {
+    padding: 11px 12px 11px 40px;
+    font-size: 14px;
+  }
+  
+  .toggle-buttons button {
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+  
+  .action-btn {
+    padding: 12px 0;
+    font-size: 14px;
+  }
+  
+  .mobile-toggle {
+    padding: 18px;
+  }
+  
+  .mobile-toggle p {
+    font-size: 13px;
+  }
+  
+  .mobile-toggle button {
+    padding: 9px 25px;
+    font-size: 13px;
+  }
+}
+
+/* Very Small Mobile (max 360px) */
+@media (max-width: 360px) {
+  .mobile-header h2 {
+    font-size: 20px;
+  }
+  
+  .mobile-header p {
+    font-size: 12px;
+  }
+  
+  .form-container h1 {
+    font-size: 22px;
+  }
+  
+  .input-field {
+    padding: 10px 10px 10px 38px;
+    font-size: 14px;
+  }
+  
+  .toggle-buttons {
+    flex-direction: column;
+    gap: 6px;
+    padding: 5px;
+  }
+  
+  .toggle-buttons button {
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .action-btn {
+    padding: 11px 0;
+  }
+  
+  .form-footer {
+    font-size: 11px;
+  }
+}
+
+/* Ensure desktop view shows on larger screens */
+@media (min-width: 769px) {
+  .mobile-hide {
+    display: block !important;
+  }
+  
+  .auth-mobile {
+    display: none !important;
+  }
+}
 
 /* Device Slider Styles */
 .device-slider-container {

@@ -106,14 +106,14 @@ export default function AuthPage() {
 
   return (
     <div className="auth-container">
-      <div className="mb-auto">   
-        <Link to="/">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Button>
-        </Link>
-      </div>
+      {/* <div className="mb-auto">   
+        <Link to="/" style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 1000 }}>
+  <Button variant="ghost">
+    <ArrowLeft className="w-4 h-4 mr-2" />
+    Back
+  </Button>
+</Link>
+      </div> */}
       {/* Desktop View */}
       <div className="auth-box mobile-hide">
         {/* Forms Container */}
