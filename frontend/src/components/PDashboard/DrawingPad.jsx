@@ -131,6 +131,8 @@ export default function DrawingPad() {
   const [isUploading, setIsUploading] = useState(false);
   const [predictionResult, setPredictionResult] = useState(null);
   const [taskType, setTaskType] = useState("spiral");
+  const [inputType, setInputType] = useState(null);
+  const isDrawingRef = useRef(false);
 
   // --- FIXED getPointData ---
   const getPointData = useCallback((e, type) => {
@@ -141,13 +143,17 @@ export default function DrawingPad() {
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
 
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
+  const rawX = (e.clientX - rect.left) * scaleX;
+  const rawY = (e.clientY - rect.top) * scaleY;
+
+  const x = rawX / canvas.width;
+  const y = rawY / canvas.height;
+
 
   let pressure = 1;
   if (e.pointerType === "pen") {
-    pressure = e.pressure || 0.1;
-  } else if (e.pointerType === "touch") {
+  pressure = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+} else if (e.pointerType === "touch") {
     pressure = 0.5;
   }
 
@@ -156,111 +162,38 @@ export default function DrawingPad() {
     y,
     time: Date.now(),
     pressure,
-    button: type === "end" ? "Released" : "Pressed",
+    button: type === "end" ? "Released" : "Pressed"
   };
 }, []);
-
-  // const getPointData = useCallback((e, type) => {
-  //   const rect = canvasRef.current.getBoundingClientRect();
-
-  //   const clientX =
-  //     e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
-  //   const clientY =
-  //     e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
-
-  //   // pressure fix
-  //   let pressure = 1;
-  //   if (typeof e.pressure === "number") {
-  //     pressure = e.pressure === 0 ? 0 : e.pressure;
-  //   } else if (type === "end") {
-  //     pressure = 0;
-  //   }
-
-  //   // button fix
-  //   const button =
-  //     type === "draw" || type === "start" ? "Pressed" : "Released";
-
-  //   return {
-  //     x: clientX - rect.left,
-  //     y: clientY - rect.top,
-  //     time: Date.now(),
-  //     type,
-  //     pressure,
-  //     button,
-  //   };
-  // }, []);
-
-  // --- Drawing Logic Fixed ---
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   const ctx = canvas.getContext("2d");
-  //   ctx.lineCap = "round";
-  //   ctx.lineWidth = 2;
-  //   ctx.strokeStyle = "#111";
-
-  //   const startDraw = (e) => {
-  //     setIsDrawing(true);
-
-  //     const startData = getPointData(e, "start");
-  //     setPoints((prev) => [...prev, startData]);
-  //   };
-
-  //   const draw = (e) => {
-  //     if (!isDrawing) return;
-
-  //     const newPoint = getPointData(e, "draw");
-
-  //     setPoints((prev) => {
-  //       const updated = [...prev, newPoint];
-  //       const prevPoint = updated[updated.length - 2];
-  //       if (prevPoint) {
-  //         ctx.beginPath();
-  //         ctx.moveTo(prevPoint.x, prevPoint.y);
-  //         ctx.lineTo(newPoint.x, newPoint.y);
-  //         ctx.stroke();
-  //       }
-  //       return updated;
-  //     });
-  //   };
-
-  //   const stopDraw = (e) => {
-  //     if (!isDrawing) return;
-  //     setIsDrawing(false);
-
-  //     const endPoint = getPointData(e, "end");
-  //     setPoints((prev) => [...prev, endPoint]);
-  //   };
-
-  //   canvas.addEventListener("mousedown", startDraw);
-  //   canvas.addEventListener("mousemove", draw);
-  //   canvas.addEventListener("mouseup", stopDraw);
-  //   canvas.addEventListener("mouseleave", stopDraw);
-
-  //   return () => {
-  //     canvas.removeEventListener("mousedown", startDraw);
-  //     canvas.removeEventListener("mousemove", draw);
-  //     canvas.removeEventListener("mouseup", stopDraw);
-  //     canvas.removeEventListener("mouseleave", stopDraw);
-  //   };
-  // }, [isDrawing, getPointData]);
 
   useEffect(() => {
   const canvas = canvasRef.current;
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+  ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  ctx.strokeStyle = "#111";
+  ctx.strokeStyle = "#000000";
 
   const startDraw = (e) => {
-    e.preventDefault();
-    canvas.setPointerCapture(e.pointerId);
-    setIsDrawing(true);
+  e.preventDefault();
+  canvas.setPointerCapture(e.pointerId);
+
+  const typeMap = {
+    pen: "Stylus",
+    touch: "Touch",
+    mouse: "Mouse",
+  };
+
+  setInputType(typeMap[e.pointerType] || "Unknown");
+
+  isDrawingRef.current = true;   
+  setIsDrawing(true);
     setPoints((prev) => [...prev, getPointData(e, "start")]);
   };
 
   const draw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;  
     e.preventDefault();
 
     setPoints((prev) => {
@@ -269,10 +202,10 @@ export default function DrawingPad() {
       const prevPoint = updated[updated.length - 2];
 
       if (prevPoint) {
-        ctx.lineWidth = 1 + point.pressure * 3;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(prevPoint.x, prevPoint.y);
-        ctx.lineTo(point.x, point.y);
+        ctx.moveTo(prevPoint.x * canvas.width, prevPoint.y * canvas.height);
+        ctx.lineTo(point.x * canvas.width, point.y * canvas.height);
         ctx.stroke();
       }
       return updated;
@@ -280,7 +213,9 @@ export default function DrawingPad() {
   };
 
   const stopDraw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
+
+    isDrawingRef.current = false;   
     setIsDrawing(false);
     setPoints((prev) => [...prev, getPointData(e, "end")]);
   };
@@ -298,7 +233,7 @@ export default function DrawingPad() {
     canvas.removeEventListener("pointerleave", stopDraw);
     canvas.removeEventListener("pointercancel", stopDraw);
   };
-}, [isDrawing, getPointData]);
+}, [getPointData]);
 
   // --- Clear Canvas ---
   const clearCanvas = () => {
@@ -406,27 +341,6 @@ const downloadDrawing = () => {
           <Download className="w-5 h-5 mr-2" />
           Download Drawing
         </button>
-
-        {/* <button
-          onClick={() => {
-            const canvas = canvasRef.current;
-            const link = document.createElement("a");
-            link.download = "drawing.png";
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-          }}
-          disabled={points.length === 0}
-          // className={`flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium transition-all w-full max-w-xs
-           className={`flex items-center justify-center px-6 py-3 rounded-lg text-white font-medium
-          ${
-            points.length === 0
-              ? "bg-gray-300 cursor-not-allowed text-gray-600"
-              : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-md"
-          }`}
-        >
-          <Download className="w-5 h-5 mr-2" />
-          Download Drawing
-        </button> */}
       </div>
 
       {/* Task Selector */}
@@ -435,7 +349,29 @@ const downloadDrawing = () => {
       <h2 className="text-2xl font-semibold text-gray-800">
         Spiral Drawing Test
       </h2>
-      <canvas
+{inputType && (
+  <div className="flex justify-center items-center mt-2">
+    <div
+      className={`px-4 py-1 rounded-full text-sm font-medium shadow-sm ${
+        inputType === "Stylus"
+          ? "bg-green-100 text-green-700"
+          : inputType === "Touch"
+          ? "bg-orange-100 text-orange-700"
+          : "bg-blue-100 text-blue-700"
+      }`}
+    >
+      Device: {inputType}
+    </div>
+  </div>
+)}
+
+   {inputType && inputType !== "Stylus" && (
+  <p className="text-orange-500 text-sm text-center mt-1">
+    ⚠️ For best accuracy, use a stylus-enabled device
+  </p>
+)}
+
+<canvas
   ref={canvasRef}
   width={
     window.innerWidth < 640
@@ -451,15 +387,9 @@ const downloadDrawing = () => {
       ? 300
       : 320
   }
+  style={{ touchAction: "none" }}
   className="w-full max-w-md mx-auto border-2 border-gray-600 bg-white rounded-lg shadow-md cursor-crosshair touch-none"
 />
-{/* 
-      <canvas
-        ref={canvasRef}
-        width={600}
-        height={400}
-        className="border-2 border-gray-600 bg-white rounded-lg shadow-md cursor-crosshair"
-      ></canvas> */}
 
       {/* Buttons */}
       <div className="flex flex-col items-center space-y-2 w-full">
@@ -535,8 +465,8 @@ const downloadDrawing = () => {
             {points.slice(-20).map((p, i) => (
               <tr key={i} className="border-t">
                 <td className="px-3 py-1">{i + 1}</td>
-                <td className="px-3 py-1">{p.x?.toFixed(1)}</td>
-                <td className="px-3 py-1">{p.y?.toFixed(1)}</td>
+                <td className="px-3 py-1"> {canvasRef.current ? (p.x * canvasRef.current.width).toFixed(1) : 0}</td>
+                <td className="px-3 py-1"> {canvasRef.current ? (p.y * canvasRef.current.height).toFixed(1) : 0}</td>
                 <td className="px-3 py-1">{p.time}</td>
                 <td className="px-3 py-1">{p.pressure?.toFixed(2)}</td>
                 <td className="px-3 py-1">{p.button}</td>
