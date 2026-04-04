@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { User, Lock, Mail, ArrowLeft } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { User, Lock, Mail} from "lucide-react";
 import "../styles/style.css";
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const [showLogin, setShowLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);  // ADD THIS
+  const [loadingMessage, setLoadingMessage] = useState("");  // ADD THIS
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -28,6 +29,9 @@ export default function AuthPage() {
       alert("Please fill in all fields");
       return;
     }
+
+     setIsLoading(true);
+     setLoadingMessage("Signing you in...");
    
      try {
     const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
@@ -43,6 +47,8 @@ export default function AuthPage() {
     const data = await res.json();
 
     if (!res.ok) {
+      setIsLoading(false);
+      setLoadingMessage("");
       alert(data.message || "Login failed");
       return;
     }
@@ -51,15 +57,21 @@ export default function AuthPage() {
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role); // 'admin' or 'patient'
     localStorage.setItem("userId", data.userId);
+
+    setLoadingMessage("Success! Redirecting...");
     
     // Redirect based on role
+    setTimeout(() => {
     if (data.role === "admin") {
       navigate("/admindashboard");
     } else {
       navigate("/patientdashboard");
     }
-  } catch (err) {
+  }, 500);
+ } catch (err) {
     console.error(err);
+     setIsLoading(false);
+     setLoadingMessage("");
     alert("Something went wrong!");
   }
 };
@@ -73,7 +85,8 @@ export default function AuthPage() {
       alert("Please accept the Terms & Conditions");
       return;
     }
-   
+   setIsLoading(true);
+   setLoadingMessage("Creating your account...");
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
         method: "POST",
@@ -89,16 +102,26 @@ export default function AuthPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        setIsLoading(false);
+        setLoadingMessage("");
         alert(data.message || "Signup failed");
         return;
       }
+      setLoadingMessage("Account created! Redirecting to login...");
 
+      setTimeout(() => {
+      setIsLoading(false);
+      setLoadingMessage("");
       alert("Account created successfully!");
+      setShowLogin(true);
+    }, 1000);
 
       // After signup, log in automatically
       setShowLogin(true);
     } catch (err) {
       console.error(err);
+      setIsLoading(false);
+      setLoadingMessage("");
       alert("Something went wrong!");
     }
   };
@@ -127,6 +150,8 @@ export default function AuthPage() {
               handleLogin={handleLogin}
               setFormData={setFormData}
               setShowLogin={setShowLogin}
+              isLoading={isLoading}           // ADD THIS
+              loadingMessage={loadingMessage}
             />
           </div>
           <div className="form-section right-form">
@@ -136,6 +161,8 @@ export default function AuthPage() {
               handleSignup={handleSignup}
               setFormData={setFormData}
               setShowLogin={setShowLogin}
+              isLoading={isLoading}
+              loadingMessage={loadingMessage}
             />
           </div>
         </div>
@@ -205,6 +232,8 @@ export default function AuthPage() {
               setFormData={setFormData}
               setShowLogin={setShowLogin}
               isMobile={true}
+              isLoading={isLoading}         
+              loadingMessage={loadingMessage}
             />
           ) : (
             <Signup
@@ -214,6 +243,8 @@ export default function AuthPage() {
               setFormData={setFormData}
               setShowLogin={setShowLogin}
               isMobile={true}
+              isLoading={isLoading}
+              loadingMessage={loadingMessage}
             />
           )}
         </div>
@@ -230,7 +261,7 @@ export default function AuthPage() {
 }
 
 // Login Component
-function Login({ formData, handleInputChange, handleLogin, setFormData, setShowLogin, isMobile }) {
+function Login({ formData, handleInputChange, handleLogin, setFormData, setShowLogin, isMobile, isLoading, loadingMessage }) {
   return (
     <div className="form-container">
       {!isMobile && (
@@ -285,7 +316,7 @@ function Login({ formData, handleInputChange, handleLogin, setFormData, setShowL
         <label> <input type="checkbox" /> Remember me</label>
       </div>
 
-      <ActionButton text="Sign In" onClick={handleLogin} />
+      <ActionButton text="Sign In" onClick={handleLogin}  isLoading={isLoading} loadingMessage={loadingMessage} />
 
        <span  className="form-footer">Don't have an account? <button onClick={() => setShowLogin(false)}>Sign up</button></span>
     </div>
@@ -293,7 +324,7 @@ function Login({ formData, handleInputChange, handleLogin, setFormData, setShowL
 }
 
 // Signup Component
-function Signup({ formData, handleInputChange, handleSignup, setFormData, setShowLogin, isMobile }) {
+function Signup({ formData, handleInputChange, handleSignup, setFormData, setShowLogin, isMobile, isLoading, loadingMessage }) {
   return (
     <div className="form-container">
       {!isMobile && (
@@ -359,7 +390,7 @@ function Signup({ formData, handleInputChange, handleSignup, setFormData, setSho
         />
         I agree to the Terms & Conditions
       </label>
-      <ActionButton  text="Create Account" onClick={handleSignup} />
+      <ActionButton  text="Create Account" onClick={handleSignup} isLoading={isLoading} loadingMessage={loadingMessage}/>
       <span className="form-footer">Already have an account? <button onClick={() => setShowLogin(true)}>Sign in</button></span>
     </div>
   );
@@ -382,10 +413,21 @@ function InputField({ icon, name, type = "text", placeholder, value, onChange })
   );
 }
 
-function ActionButton({ text, onClick }) {
+function ActionButton({ text, onClick, isLoading, loadingMessage }) {
   return (
-    <button className="action-btn" onClick={onClick}>
-      {text}
+    <button className="action-btn" onClick={onClick} disabled={isLoading}
+      style={{ 
+        opacity: isLoading ? 0.7 : 1,
+        cursor: isLoading ? 'not-allowed' : 'pointer'
+      }}>
+       {isLoading ? (
+        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <span className="spinner"></span>
+          {loadingMessage || "Processing..."}
+        </span>
+      ) : (
+        text
+      )}
     </button>
   );
 }
